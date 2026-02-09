@@ -1,0 +1,44 @@
+# macOS
+.DS_Store
+
+# Xcode user-specific data
+*.xcuserstate
+*.xcuserdatad/
+xcuserdata/
+*.xccheckout
+*.xcscmblueprint
+
+# Workspace/project user state
+*.xcodeproj/project.xcworkspace/xcuserdata/
+*.xcodeproj/xcuserdata/
+
+# Build artifacts
+build/
+DerivedData/
+*.moved-aside
+*.ipa
+*.dSYM
+*.dSYM.zip
+
+# SwiftPM local artifacts
+.build/
+.swiftpm/
+
+# Local env/secrets (do not commit)
+.env
+.env.*
+*.p8
+*.p12
+*.mobileprovision
+*.pem
+*.key
+
+# ML model artifacts (do not commit binaries/weights)
+*.mlmodel
+*.mlpackage
+*.mlmodelc
+*.onnx
+*.pth
+*.ckpt
+*.safetensors
+*.th

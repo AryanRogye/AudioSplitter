@@ -1,0 +1,7 @@
+coremltools>=9.0
+torch>=2.0
+numpy>=1.24
+
+# Optional, only required when --source is .onnx
+onnx>=1.14
+onnx2torch>=1.5
