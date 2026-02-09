@@ -66,7 +66,65 @@ struct TimelineEditorView: View {
 
 #Preview {
     
-    @Previewable @StateObject var viewModel = AudioLibraryViewModel()
+    let sampleHistory: [ProcessedTrackHistoryItem] = [
+        ProcessedTrackHistoryItem(
+            id: UUID(),
+            sourceFileName: "Track 1.mp3",
+            sourceFileURL: URL(fileURLWithPath: "/tmp/track1.mp3"),
+            createdAt: .now,
+            sourceFingerprint: [0.1, 0.3, 0.9],
+            stems: [
+                StoredStemAsset(
+                    id: UUID(),
+                    kind: .vocals,
+                    fileURL: URL(fileURLWithPath: "/tmp/track1_vocals.mp3"),
+                    sourceTrackName: "Opposite",
+                    createdAt: .now,
+                    customName: "Don Toliver"
+                ),
+                StoredStemAsset(
+                    id: UUID(),
+                    kind: .instrumental,
+                    fileURL: URL(fileURLWithPath: "/tmp/track1_instrumental.mp3"),
+                    sourceTrackName: "Mo City Flexologist",
+                    createdAt: .now,
+                    customName: "Travis Scott"
+                )
+            ],
+            customName: "My Remix Track"
+        ),
+        ProcessedTrackHistoryItem(
+            id: UUID(),
+            sourceFileName: "Track 2.wav",
+            sourceFileURL: URL(fileURLWithPath: "/tmp/track2.wav"),
+            createdAt: .now.addingTimeInterval(-3600),
+            sourceFingerprint: [0.2, 0.4, 0.7],
+            stems: [
+                StoredStemAsset(
+                    id: UUID(),
+                    kind: .vocals,
+                    fileURL: URL(fileURLWithPath: "/tmp/track1_vocals.mp3"),
+                    sourceTrackName: "Opposite",
+                    createdAt: .now,
+                    customName: "Don Toliver"
+                ),
+                StoredStemAsset(
+                    id: UUID(),
+                    kind: .instrumental,
+                    fileURL: URL(fileURLWithPath: "/tmp/track1_instrumental.mp3"),
+                    sourceTrackName: "Mo City Flexologist",
+                    createdAt: .now,
+                    customName: "Travis Scott"
+                )
+            ],
+            customName: nil
+        )
+    ]
+
     
-    EditorView(viewModel: viewModel)
+    EditorView(
+        viewModel: AudioLibraryViewModel(
+            previewHistory: sampleHistory
+        )
+    )
 }

@@ -39,6 +39,17 @@ final class AudioLibraryViewModel: ObservableObject {
     private var previewTimelineTimer: Timer?
     private var stageTimelineTimer: Timer?
 
+    convenience init(previewHistory: [ProcessedTrackHistoryItem]) {
+        self.init(
+            historyStore: FileAudioHistoryStoreAdapter(),
+            fingerprinting: AVAudioFingerprintAdapter(),
+            stagePlayback: AVAudioStagePlaybackAdapter(),
+            previewPlayback: AVAudioStagePreviewPlaybackAdapter(),
+            stageMixExporter: AVAudioStageMixExporterAdapter()
+        )
+        self.history = previewHistory
+    }
+    
     convenience init() {
         self.init(
             historyStore: FileAudioHistoryStoreAdapter(),

@@ -63,7 +63,7 @@ struct DraggableBottomSheet<Content: View>: View {
             Spacer(minLength: 0)
         }
         .frame(maxWidth: .infinity)
-        .frame(height: areaHeight)
+        .frame(height: max(0, areaHeight))
         .background(.ultraThinMaterial, in: shape)
         .overlay(
             shape.stroke(.white.opacity(0.12))
