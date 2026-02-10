@@ -9,6 +9,7 @@ import SwiftUI
 
 struct LibraryModalContent: View {
     
+    @Bindable var editorVM : EditorViewModel
     @ObservedObject var viewModel: AudioLibraryViewModel
     @State private var selectedItem: ProcessedTrackHistoryItem? = nil
     
@@ -25,13 +26,24 @@ struct LibraryModalContent: View {
                     ForEach(viewModel.history.indices, id: \.self) { index in
                         let item = viewModel.history[index]
                         let isSelected = item == selectedItem
+                        let isStaged = editorVM.stagedTracks.contains(item)
                         LibraryModalRow(
                             isSelected: isSelected,
                             item: item,
+                            isStaged: isStaged,
                             onClick: {
                                 withAnimation(.snappy) {
                                     selectItemInModal(item: item)
                                 }
+                            },
+                            onAdd: {
+                                editorVM.addToStaged(item)
+                            },
+                            onRename: { newValue in
+                                viewModel.renameHistoryItem(id: item.id, newName: newValue)
+                            },
+                            onErase: {
+                                viewModel.deleteHistoryItem(id: item.id)
                             }
                         )
                     }
@@ -56,12 +68,25 @@ struct LibraryModalRow: View {
     
     var isSelected: Bool
     var item: ProcessedTrackHistoryItem
+    var isStaged: Bool
     var onClick: () -> Void
+    var onAdd: () -> Void
+    var onRename: (String) -> Void
+    var onErase: () -> Void
     
     var body: some View {
         VStack(spacing: 0) {
             Button(action: onClick) {
                 HStack {
+                    /// If we have this item staged, we can add it again, but we should show a indicator that
+                    /// something is already staged inside
+                    if isStaged {
+                        Image(systemName: "checkmark.circle.fill")
+                            .foregroundStyle(.green)
+                            .font(.system(size: 14))
+                            .transition(.scale.combined(with: .opacity)) // Nice pop-in effect
+                            .padding(.leading, 8)
+                    }
                     /// name to display
                     /// making sure that it can only be 2 lines
                     Text(item.displayName)
@@ -76,7 +101,7 @@ struct LibraryModalRow: View {
                     /// On Click Chevron
                     Image(systemName: "chevron.right")
                         .font(.system(size: 12, weight: .bold))
-                        .foregroundStyle(isSelected ? .primary : .secondary)
+                        .foregroundStyle(.secondary)
                         .rotationEffect(.degrees(isSelected ? 90 : 0)) // Rotate when open
                         .padding(8)
                 }
@@ -84,11 +109,12 @@ struct LibraryModalRow: View {
             }
             .buttonStyle(.plain)
             
+            /// when we select the item row, a dropdown or "section" opens up underneath revealing these items
             if isSelected {
                 HStack(spacing: 0) {
-                    LibraryRowButton(text: "Add"   , systemName: "plus"  , color: Color(.systemGreen), isLeft: true, isRight: false) { }
-                    LibraryRowButton(text: "Rename", systemName: "pencil", color: .blue, isLeft: false, isRight: false) { }
-                    LibraryRowButton(text: "Delete", systemName: "trash",  color: .red, isLeft: false, isRight: true) { }
+                    LibraryRowButton(text: "Add"   , systemName: "plus"  , color: Color(.systemGreen), isLeft: true, isRight: false) { onAdd() }
+                    LibraryRowButton(text: "Rename", systemName: "pencil", color: .blue, isLeft: false, isRight: false) { rename() }
+                    LibraryRowButton(text: "Delete", systemName: "trash",  color: .red, isLeft: false, isRight: true) { onErase() }
                 }
                 .transition(
                     .asymmetric(
@@ -104,6 +130,25 @@ struct LibraryModalRow: View {
             isSelected ? .regularMaterial : .ultraThinMaterial,
             in: RoundedRectangle(cornerRadius: 12)
         )
+        /// Rename alert
+        .alert("Rename \"\(item.displayName)\"", isPresented: $showRenameAlert) {
+            TextField(text: $renameText) { }
+            Button("Cancel", role: .cancel) { }
+            Button("OK") {
+                if renameText.isEmpty { return }
+                onRename(renameText)
+            }
+        } message: {
+            Text("Enter the new name")
+        }
+    }
+    
+    /// Rename related
+    @State private var showRenameAlert: Bool = false
+    @State private var renameText: String = ""
+    private func rename() {
+        renameText = item.displayName
+        showRenameAlert = true
     }
 }
 
@@ -150,3 +195,4 @@ struct ScaleButtonStyle: ButtonStyle {
             .animation(.easeOut(duration: 0.1), value: configuration.isPressed)
     }
 }
+

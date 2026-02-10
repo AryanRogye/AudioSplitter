@@ -31,7 +31,10 @@ struct LibraryPicker: View {
         ZStack(alignment: .bottom) {
             
             /// Real Content
-            currentLibraryContent
+            CurrentLibraryContent(
+                viewModel: viewModel,
+                editorVM: editorVM
+            )
             
             /// Draggable Configuration
             DraggableBottomSheet(
@@ -40,19 +43,12 @@ struct LibraryPicker: View {
                 title: "Your Library \(viewModel.history.count)"
             ) {
                 /// Draggable Content
-                LibraryModalContent(viewModel: viewModel)
+                LibraryModalContent(
+                    editorVM: editorVM,
+                    viewModel: viewModel
+                )
             }
         }
         .clipped()
-    }
-    
-    var currentLibraryContent: some View {
-        // 1. Base Content
-        VStack(alignment: .leading, spacing: 10) {
-            Text("Library").font(.headline)
-            Text("Main content area...").foregroundStyle(.secondary)
-        }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(Color(.systemGray6))
     }
 }
