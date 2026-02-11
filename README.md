@@ -1,6 +1,11 @@
 # AudioSplitter
 
-AudioSplitter is an iOS app for on-device stem separation, playback, and library/staging workflows.
+
+AudioSplitter is an on-device audio **machine learning system** for iOS focused on **neural stem separation** and **local inference pipelines**.
+
+The project explores deploying **UVR/MDX-style source separation networks** fully on device using **Core ML**, including **model conversion (ONNX → CoreML)**, **tensor preprocessing**, **streaming inference**, and **memory-aware audio reconstruction** all running locally on iPhone hardware with **no cloud dependency**.
+
+It serves as both a functional app and a **reference implementation** for shipping **real-world ML audio pipelines** directly on iOS.
 
 ## License
 
