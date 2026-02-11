@@ -19,6 +19,7 @@ final class AudioLibraryViewModel: ObservableObject {
 
     @Published var selectedVocalID: StoredStemAsset.ID?
     @Published var selectedInstrumentalID: StoredStemAsset.ID?
+    
     @Published var vocalStartTime: Double = 0
     @Published var instrumentalStartTime: Double = 0
     @Published var stageDelay: Double = 0
@@ -440,13 +441,13 @@ final class AudioLibraryViewModel: ObservableObject {
     }
 
     private func resetStageSelectionIfNeeded() {
-        if selectedVocalAsset == nil {
-            selectedVocalID = availableVocalAssets.first?.id
-        }
-
-        if selectedInstrumentalAsset == nil {
-            selectedInstrumentalID = availableInstrumentalAssets.first?.id
-        }
+//        if selectedVocalAsset == nil {
+//            selectedVocalID = availableVocalAssets.first?.id
+//        }
+//
+//        if selectedInstrumentalAsset == nil {
+//            selectedInstrumentalID = availableInstrumentalAssets.first?.id
+//        }
     }
 
     private func togglePreview(role: StageTrackRole, url: URL?, startTime: Double) {

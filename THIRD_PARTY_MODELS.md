@@ -1,6 +1,6 @@
 # Third-Party Model Notes
 
-AudioSplitter code is MIT-licensed (see `LICENSE`), but model weights are separate artifacts and can have different licenses/terms.
+AudioSplitter code is LGPL-2.1-or-later licensed (see `LICENSE`), but model weights are separate artifacts and can have different licenses/terms.
 
 ## UVR MDX Models
 

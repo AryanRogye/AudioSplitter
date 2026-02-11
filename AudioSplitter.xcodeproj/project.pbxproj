@@ -6,13 +6,30 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		9BAAC2AE2F3C308E0077E402 /* YoutubeDL in Frameworks */ = {isa = PBXBuildFile; productRef = 9BAAC2AD2F3C308E0077E402 /* YoutubeDL */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXFileReference section */
 		9BB7997B2F37DA82002526E6 /* AudioSplitter.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AudioSplitter.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		9BAAC2B72F3C3E0B0077E402 /* Exceptions for "AudioSplitter" folder in "AudioSplitter" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 9BB7997A2F37DA82002526E6 /* AudioSplitter */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		9BB7997D2F37DA82002526E6 /* AudioSplitter */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				9BAAC2B72F3C3E0B0077E402 /* Exceptions for "AudioSplitter" folder in "AudioSplitter" target */,
+			);
 			path = AudioSplitter;
 			sourceTree = "<group>";
 		};
@@ -23,6 +40,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				9BAAC2AE2F3C308E0077E402 /* YoutubeDL in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -65,6 +83,7 @@
 			);
 			name = AudioSplitter;
 			packageProductDependencies = (
+				9BAAC2AD2F3C308E0077E402 /* YoutubeDL */,
 			);
 			productName = AudioSplitter;
 			productReference = 9BB7997B2F37DA82002526E6 /* AudioSplitter.app */;
@@ -94,6 +113,9 @@
 			);
 			mainGroup = 9BB799722F37DA82002526E6;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				9BAAC2AC2F3C308E0077E402 /* XCRemoteSwiftPackageReference "YoutubeDL-iOS" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 9BB7997C2F37DA82002526E6 /* Products */;
 			projectDirPath = "";
@@ -256,6 +278,8 @@
 				DEVELOPMENT_TEAM = B9P888266K;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = AudioSplitter/Info.plist;
+				INFOPLIST_KEY_LSSupportsOpeningDocumentsInPlace = YES;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -288,6 +312,8 @@
 				DEVELOPMENT_TEAM = B9P888266K;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = AudioSplitter/Info.plist;
+				INFOPLIST_KEY_LSSupportsOpeningDocumentsInPlace = YES;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -332,6 +358,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		9BAAC2AC2F3C308E0077E402 /* XCRemoteSwiftPackageReference "YoutubeDL-iOS" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/kewlbear/YoutubeDL-iOS#";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.0.9;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		9BAAC2AD2F3C308E0077E402 /* YoutubeDL */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 9BAAC2AC2F3C308E0077E402 /* XCRemoteSwiftPackageReference "YoutubeDL-iOS" */;
+			productName = YoutubeDL;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 9BB799732F37DA82002526E6 /* Project object */;
 }

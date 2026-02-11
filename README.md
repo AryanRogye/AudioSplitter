@@ -4,9 +4,10 @@ AudioSplitter is an iOS app for on-device stem separation, playback, and library
 
 ## License
 
-This repository's source code is licensed under MIT.
+This repository's source code is licensed under LGPL-2.1-or-later.
 
 - See `LICENSE`.
+- Third-party software notices are in `THIRD_PARTY_NOTICES.md`.
 - Third-party model licensing and attribution notes are in `THIRD_PARTY_MODELS.md`.
 
 ## Requirements
@@ -121,11 +122,28 @@ If the model is missing or incompatible, the app reports errors from:
 
 ## Attribution and Model License Notes
 
-- App code is MIT (`LICENSE`).
-- Model files are third-party assets and are not automatically covered by this repo's MIT license.
+- App code is LGPL-2.1-or-later (`LICENSE`).
+- Third-party software notices and package versions are listed in `THIRD_PARTY_NOTICES.md`.
+- Model files are third-party assets and are not automatically covered by this repo's app code license.
 - Verify model redistribution/commercial terms for the exact model you use.
 - Include model attribution in public releases.
 - See `THIRD_PARTY_MODELS.md` for a template and links.
+
+## FFmpeg / LGPL Compliance Notes
+
+This app currently depends on FFmpeg packages distributed under LGPL-2.1+.
+
+- `FFmpeg-iOS-Lame`
+- `FFmpeg-iOS-Support`
+
+To rebuild with modified FFmpeg:
+
+1. Follow upstream build docs in `FFmpeg-iOS-Lame` / `FFmpeg-iOS-Support`.
+2. Produce replacement FFmpeg artifacts.
+3. Update package references/revisions.
+4. Rebuild this app from source.
+
+See `THIRD_PARTY_NOTICES.md` for package versions and source links.
 
 ## Troubleshooting
 

@@ -1,5 +1,5 @@
 //
-//  LibraryPicker.swift
+//  StagingArea.swift
 //  AudioSplitter
 //
 //  Created by Aryan Rogye on 2/9/26.
@@ -7,7 +7,10 @@
 
 import SwiftUI
 
-struct LibraryPicker: View {
+/// StagingArea is the top 30% of the screen in the Editor View
+/// Allows us to choose songs to add from your library, drag and drop them into
+/// the timeline view, etc
+struct StagingArea: View {
     
     @ObservedObject var viewModel: AudioLibraryViewModel
     @Bindable var editorVM: EditorViewModel
@@ -31,7 +34,7 @@ struct LibraryPicker: View {
         ZStack(alignment: .bottom) {
             
             /// Real Content
-            CurrentLibraryContent(
+            CurrentStagingContent(
                 viewModel: viewModel,
                 editorVM: editorVM
             )
@@ -43,7 +46,7 @@ struct LibraryPicker: View {
                 title: "Your Library \(viewModel.history.count)"
             ) {
                 /// Draggable Content
-                LibraryModalContent(
+                StagingModalContent(
                     editorVM: editorVM,
                     viewModel: viewModel
                 )

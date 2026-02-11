@@ -31,7 +31,7 @@ struct EditorView: View {
             let timelineHeight = geo.size.height * 0.70;
             
             VStack(spacing: 6) {
-                LibraryPicker(
+                StagingArea(
                     viewModel: viewModel,
                     editorVM: editorVM,
                     areaHeight: libraryHeight

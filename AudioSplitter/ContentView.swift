@@ -189,6 +189,13 @@ struct ContentView: View {
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
                     NavigationLink {
+                        DownloaderView()
+                    } label: {
+                        Label("Download", systemImage: "arrow.down.circle")
+                    }
+                }
+                ToolbarItem(placement: .topBarLeading) {
+                    NavigationLink {
                         EditorView(viewModel: libraryViewModel)
                     } label: {
                         Label("Timeline", systemImage: "timeline.selection")
@@ -570,6 +577,14 @@ private struct ConfigurationSheet: View {
                         .font(.footnote)
                         .foregroundStyle(.secondary)
                 }
+
+                Section("Legal") {
+                    NavigationLink {
+                        OpenSourceNoticesView()
+                    } label: {
+                        Label("Open Source Notices", systemImage: "doc.text.magnifyingglass")
+                    }
+                }
             }
             .navigationTitle("Configuration")
             .navigationBarTitleDisplayMode(.inline)
@@ -594,6 +609,40 @@ private struct ConfigurationSheet: View {
                 }
             }
         )
+    }
+}
+
+private struct OpenSourceNoticesView: View {
+    var body: some View {
+        List {
+            Section("App License") {
+                Text("AudioSplitter source code is licensed under LGPL-2.1-or-later.")
+                Text("See LICENSE in the repository root.")
+                    .font(.footnote)
+                    .foregroundStyle(.secondary)
+            }
+
+            Section("Third-Party Components") {
+                LabeledContent("FFmpeg-iOS-Lame", value: "LGPL-2.1+")
+                LabeledContent("FFmpeg-iOS-Support", value: "LGPL-2.1+")
+                LabeledContent("YoutubeDL-iOS", value: "MIT")
+                LabeledContent("Python-iOS", value: "PSF-2.0")
+                LabeledContent("PythonKit", value: "MIT")
+                Text("See THIRD_PARTY_NOTICES.md for versions, source links, and attribution details.")
+                    .font(.footnote)
+                    .foregroundStyle(.secondary)
+            }
+
+            Section("Upstream License Links") {
+                Link("LGPL v2.1 text", destination: URL(string: "https://www.gnu.org/licenses/old-licenses/lgpl-2.1.html")!)
+                Link("FFmpeg legal guidance", destination: URL(string: "https://ffmpeg.org/legal.html")!)
+                Link("FFmpeg-iOS-Lame", destination: URL(string: "https://github.com/kewlbear/FFmpeg-iOS-Lame")!)
+                Link("FFmpeg-iOS-Support", destination: URL(string: "https://github.com/kewlbear/FFmpeg-iOS-Support")!)
+                Link("YoutubeDL-iOS", destination: URL(string: "https://github.com/kewlbear/YoutubeDL-iOS")!)
+            }
+        }
+        .navigationTitle("Open Source Notices")
+        .navigationBarTitleDisplayMode(.inline)
     }
 }
 
