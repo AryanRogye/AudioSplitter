@@ -7,18 +7,6 @@
 
 import SwiftUI
 
-@Observable
-@MainActor
-final class EditorViewModel {
-    var isRecentsOpen = false
-    var stagedTracks: [ProcessedTrackHistoryItem] = []
-    
-    /// We can add multiple of the same tracks so this is ok
-    public func addToStaged(_ item: ProcessedTrackHistoryItem) {
-        self.stagedTracks.append(item)
-    }
-}
-
 struct EditorView: View {
     
     @ObservedObject var viewModel: AudioLibraryViewModel

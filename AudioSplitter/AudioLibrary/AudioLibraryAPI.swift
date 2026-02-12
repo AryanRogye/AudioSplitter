@@ -113,6 +113,7 @@ enum StageTrackRole: String {
 
 protocol StagePreviewPlaybackControlling: AnyObject {
     var currentlyPreviewingRole: StageTrackRole? { get }
+    var isPlayingAudio: Bool { get }
     var onPreviewStateChanged: ((StageTrackRole?) -> Void)? { get set }
     var currentPlaybackTime: TimeInterval { get }
     var currentDuration: TimeInterval { get }

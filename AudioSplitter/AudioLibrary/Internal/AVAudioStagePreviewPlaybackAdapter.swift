@@ -1,5 +1,86 @@
 import AVFoundation
+import SwiftUI
 import Foundation
+import Observation
+import Combine
+
+// TODO: Clean This File Up
+
+@Observable
+@MainActor
+final class AVAudioPreviewPlayback: NSObject, AVAudioPlayerDelegate {
+    
+    var currentPlaybackTime: TimeInterval {
+        audioPlayer?.currentTime ?? 0
+    }
+    var currentDuration: TimeInterval {
+        audioPlayer?.duration ?? 0
+    }
+    
+    var isPlaying : Bool {
+        return audioPlayer?.isPlaying ?? false
+    }
+    
+    private var audioPlayer: AVAudioPlayer?
+    
+    @MainActor
+    deinit {
+        audioPlayer?.stop()
+        audioPlayer?.delegate = nil
+        audioPlayer = nil
+    }
+    
+    func togglePreview(role: StageTrackRole, fileURL: URL, startTime: TimeInterval) throws {
+        guard FileManager.default.fileExists(atPath: fileURL.path) else {
+            throw StagePreviewPlaybackError.fileMissing(path: fileURL.path)
+        }
+        
+        var sessionSetupError: Error?
+        do {
+            do {
+                let session = AVAudioSession.sharedInstance()
+                try session.setCategory(.playback, mode: .default, options: [])
+                try session.setActive(true)
+            } catch {
+                sessionSetupError = error
+            }
+            
+            let player = try AVAudioPlayer(contentsOf: fileURL)
+            player.delegate = self
+            let clampedStart = max(0, min(startTime, max(0, player.duration - 0.05)))
+            player.currentTime = clampedStart
+            player.prepareToPlay()
+            let didPlay = player.play()
+            if !didPlay {
+                throw StagePreviewPlaybackError.failedToStart
+            }
+            
+            audioPlayer = player
+        } catch {
+            stopPreview()
+            let nsError = error as NSError
+            let sessionDetails: String
+            if let sessionSetupError {
+                let sessionNSError = sessionSetupError as NSError
+                sessionDetails = " | session: \(sessionNSError.domain) (\(sessionNSError.code)): \(sessionNSError.localizedDescription)"
+            } else {
+                sessionDetails = ""
+            }
+            throw StagePreviewPlaybackError.playbackFailed(
+                details: "\(nsError.domain) (\(nsError.code)): \(nsError.localizedDescription)\(sessionDetails)"
+            )
+        }
+    }
+    
+    func stopPreview() {
+        audioPlayer?.stop()
+        audioPlayer = nil
+    }
+    
+    func audioPlayerDidFinishPlaying(_ player: AVAudioPlayer, successfully flag: Bool) {
+        stopPreview()
+    }
+}
 
 final class AVAudioStagePreviewPlaybackAdapter: NSObject, StagePreviewPlaybackControlling, AVAudioPlayerDelegate {
     var onPreviewStateChanged: ((StageTrackRole?) -> Void)?
@@ -9,6 +90,11 @@ final class AVAudioStagePreviewPlaybackAdapter: NSObject, StagePreviewPlaybackCo
     var currentDuration: TimeInterval {
         audioPlayer?.duration ?? 0
     }
+    
+    var isPlayingAudio: Bool {
+        return audioPlayer?.isPlaying ?? false
+    }
+
 
     private(set) var currentlyPreviewingRole: StageTrackRole? {
         didSet {

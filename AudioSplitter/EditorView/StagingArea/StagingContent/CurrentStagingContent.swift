@@ -7,6 +7,7 @@
 
 import SwiftUI
 
+/// Currently Staged Content, this is the top 30% of the screen in the EditorView
 struct CurrentStagingContent: View {
     @ObservedObject var viewModel: AudioLibraryViewModel
     @Bindable var editorVM: EditorViewModel
@@ -36,9 +37,11 @@ struct CurrentStagingContent: View {
                 /// List of all staged songs
                 ScrollView {
                     VStack(spacing: 8) {
-                        ForEach(Array(editorVM.stagedTracks), id: \.self) { track in
-                            StagedBundleCard(item: track)
-                                .environmentObject(viewModel)
+                        ForEach(editorVM.stagedTracks.indices, id: \.self) { index in
+                            let track = editorVM.stagedTracks[index]
+                            StagedBundleCard(item: track) {
+                                editorVM.removeFromStaged(track)
+                            }
                         }
                     }
                     .padding(.horizontal)
