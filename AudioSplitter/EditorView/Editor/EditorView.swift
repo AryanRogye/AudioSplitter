@@ -36,28 +36,6 @@ struct EditorView: View {
     }
 }
 
-struct TimelineEditorView: View {
-    
-    let shape = UnevenRoundedRectangle(
-        topLeadingRadius: 0,
-        bottomLeadingRadius: 32,
-        bottomTrailingRadius: 32,
-        topTrailingRadius: 0,
-        style: .continuous
-    )
-
-    var body: some View {
-        VStack {
-            VStack {
-                Text("Hellok")
-            }
-        }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background (shape.fill(Color(.systemGray6)))
-    }
-}
-
-
 #Preview {
     
     let sampleHistory: [ProcessedTrackHistoryItem] = [

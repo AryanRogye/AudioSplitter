@@ -77,6 +77,21 @@ final class AVAudioPreviewPlayback: NSObject, AVAudioPlayerDelegate {
         audioPlayer = nil
     }
     
+    func seek(to time: TimeInterval) {
+        guard let audioPlayer else { return }
+        
+        let dur = audioPlayer.duration
+        guard dur.isFinite, dur > 0 else { return }
+        
+        let wasPlaying = audioPlayer.isPlaying
+        let clamped = max(0, min(time, dur - 0.05))
+        
+        if wasPlaying { audioPlayer.pause() }
+        audioPlayer.currentTime = clamped
+        if wasPlaying { audioPlayer.play() }
+    }
+
+    
     func audioPlayerDidFinishPlaying(_ player: AVAudioPlayer, successfully flag: Bool) {
         stopPreview()
     }

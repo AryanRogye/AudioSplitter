@@ -42,6 +42,14 @@ struct CurrentStagingContent: View {
                             StagedBundleCard(item: track) {
                                 editorVM.removeFromStaged(track)
                             }
+                            .contentShape(.dragPreview, RoundedRectangle(cornerRadius: 12))
+                            .draggable(track) {
+                                VStack {
+                                    Text(track.displayName)
+                                }
+                                .padding(6)
+                                .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 12, style: .continuous))
+                            }
                         }
                     }
                     .padding(.horizontal)

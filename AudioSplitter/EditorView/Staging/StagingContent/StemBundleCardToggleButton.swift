@@ -22,6 +22,13 @@ struct StemBundleCardToggleButton: View {
     
     var body: some View {
         Button {
+            if stem.kind == .vocals, selected == .vocal {
+                selected = .none
+                return
+            } else if stem.kind == .instrumental, selected == .instrumental {
+                selected = .none
+                return
+            }
             selected = stem.kind == .vocals ? .vocal : .instrumental
         } label: {
             Text(stem.kind.rawValue.prefix(1).uppercased())

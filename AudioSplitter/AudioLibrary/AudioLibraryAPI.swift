@@ -1,4 +1,10 @@
 import Foundation
+import CoreTransferable
+import UniformTypeIdentifiers
+
+extension UTType {
+    static let audioSplitterTrack = UTType(exportedAs: "com.aryanrogye.processedTrack")
+}
 
 extension StemKind: Codable {}
 
@@ -11,7 +17,7 @@ struct StoredStemAsset: Identifiable, Codable, Hashable {
     var customName: String?
 }
 
-struct ProcessedTrackHistoryItem: Identifiable, Codable, Hashable {
+struct ProcessedTrackHistoryItem: Identifiable, Codable, Hashable, Transferable {
     let id: UUID
     let sourceFileName: String
     var sourceFileURL: URL
@@ -19,6 +25,10 @@ struct ProcessedTrackHistoryItem: Identifiable, Codable, Hashable {
     let sourceFingerprint: [Float]
     var stems: [StoredStemAsset]
     var customName: String?
+    
+    static var transferRepresentation: some TransferRepresentation {
+        CodableRepresentation(contentType: .audioSplitterTrack)
+    }
 }
 
 struct SavedLayeredMix: Identifiable, Codable, Hashable {

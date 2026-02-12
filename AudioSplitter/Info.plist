@@ -1,11 +1,31 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
-<dict>
-	<key>UIFileSharingEnabled</key>
-	<true/>
-    
-    <key>NSPhotoLibraryAddUsageDescription</key>
-    <string>Need this bro</string>
-</dict>
+    <dict>
+        <key>UIBackgroundModes</key>
+        <array>
+            <string>audio</string>
+            <string>processing</string>
+        </array>
+        
+        <key>UIFileSharingEnabled</key>
+        <true/>
+        
+        <key>NSPhotoLibraryAddUsageDescription</key>
+        <string>Need this bro</string>
+        
+        <key>UTExportedTypeDeclarations</key>
+        <array>
+            <dict>
+                <key>UTTypeIdentifier</key>
+                <string>com.aryanrogye.processedTrack</string>
+                <key>UTTypeDescription</key>
+                <string>Processed Audio Track</string>
+                <key>UTTypeConformsTo</key>
+                <array>
+                    <string>public.data</string>
+                </array>
+            </dict>
+        </array>
+    </dict>
 </plist>
