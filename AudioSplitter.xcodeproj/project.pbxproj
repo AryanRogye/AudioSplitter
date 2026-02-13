@@ -7,7 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		9B6031782F3EB3AB00FC5733 /* AudioUI in Frameworks */ = {isa = PBXBuildFile; productRef = 9B6031772F3EB3AB00FC5733 /* AudioUI */; };
 		9BAAC2AE2F3C308E0077E402 /* YoutubeDL in Frameworks */ = {isa = PBXBuildFile; productRef = 9BAAC2AD2F3C308E0077E402 /* YoutubeDL */; };
 /* End PBXBuildFile section */
 
@@ -42,7 +41,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				9BAAC2AE2F3C308E0077E402 /* YoutubeDL in Frameworks */,
-				9B6031782F3EB3AB00FC5733 /* AudioUI in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -86,7 +84,6 @@
 			name = AudioSplitter;
 			packageProductDependencies = (
 				9BAAC2AD2F3C308E0077E402 /* YoutubeDL */,
-				9B6031772F3EB3AB00FC5733 /* AudioUI */,
 			);
 			productName = AudioSplitter;
 			productReference = 9BB7997B2F37DA82002526E6 /* AudioSplitter.app */;
@@ -118,7 +115,6 @@
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
 				9BAAC2AC2F3C308E0077E402 /* XCRemoteSwiftPackageReference "YoutubeDL-iOS" */,
-				9B6031762F3EB3AB00FC5733 /* XCLocalSwiftPackageReference "AudioUI" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 9BB7997C2F37DA82002526E6 /* Products */;
@@ -363,13 +359,6 @@
 		};
 /* End XCConfigurationList section */
 
-/* Begin XCLocalSwiftPackageReference section */
-		9B6031762F3EB3AB00FC5733 /* XCLocalSwiftPackageReference "AudioUI" */ = {
-			isa = XCLocalSwiftPackageReference;
-			relativePath = AudioUI;
-		};
-/* End XCLocalSwiftPackageReference section */
-
 /* Begin XCRemoteSwiftPackageReference section */
 		9BAAC2AC2F3C308E0077E402 /* XCRemoteSwiftPackageReference "YoutubeDL-iOS" */ = {
 			isa = XCRemoteSwiftPackageReference;
@@ -382,10 +371,6 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		9B6031772F3EB3AB00FC5733 /* AudioUI */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = AudioUI;
-		};
 		9BAAC2AD2F3C308E0077E402 /* YoutubeDL */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 9BAAC2AC2F3C308E0077E402 /* XCRemoteSwiftPackageReference "YoutubeDL-iOS" */;

@@ -37,19 +37,17 @@ struct CurrentStagingContent: View {
                 ScrollView {
                     VStack(spacing: 8) {
                         ForEach(editorVM.stagedTracks.indices, id: \.self) { index in
-                            if index < editorVM.stagedTracks.count {
-                                let track = editorVM.stagedTracks[index]
-                                StagedBundleCard(item: track) {
-                                    editorVM.removeFromStaged(track)
+                            let track = editorVM.stagedTracks[index]
+                            StagedBundleCard(item: track) {
+                                editorVM.removeFromStaged(track)
+                            }
+                            .contentShape(.dragPreview, RoundedRectangle(cornerRadius: 12))
+                            .draggable(track) {
+                                VStack {
+                                    Text(track.displayName)
                                 }
-                                .contentShape(.dragPreview, RoundedRectangle(cornerRadius: 12))
-                                .draggable(track) {
-                                    VStack {
-                                        Text(track.displayName)
-                                    }
-                                    .padding(6)
-                                    .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 12, style: .continuous))
-                                }
+                                .padding(6)
+                                .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 12, style: .continuous))
                             }
                         }
                     }

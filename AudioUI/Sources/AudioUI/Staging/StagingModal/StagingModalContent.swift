@@ -44,7 +44,7 @@ struct StagingModalContent: View {
                                 editorVM.addToStaged(item)
                             },
                             onRename: { newValue in
-                                editorVM.renameEditorClip(item: item, newName: newValue)
+                                editorVM.renameHistoryItem(id: item.id, newName: newValue)
                             },
                             onErase: {
                                 //                                viewModel.deleteHistoryItem(id: item.id)

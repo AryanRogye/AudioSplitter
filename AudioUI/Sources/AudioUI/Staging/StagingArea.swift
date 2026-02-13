@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import AudioUI
 
 /// StagingArea is the top 30% of the screen in the Editor View
 /// Allows us to choose songs to add from your library, drag and drop them into

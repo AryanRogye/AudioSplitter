@@ -143,6 +143,7 @@ final class AudioLibraryViewModel: ObservableObject {
             
             let editorFile = EditorFile(
                 hist.sourceFileURL,
+                id: hist.id,
                 name: hist.displayName,
                 created: hist.createdAt,
                 type: .all
@@ -150,10 +151,11 @@ final class AudioLibraryViewModel: ObservableObject {
             files.append(editorFile)
             
             for stem in hist.stems {
-                var kind: SongType = stem.kind == .vocals ? .vocal : .instrumental
+                let kind: SongType = stem.kind == .vocals ? .vocal : .instrumental
                 
                 let stemFile = EditorFile(
                     stem.fileURL,
+                    id: stem.id,
                     name: stem.displayName,
                     created: stem.createdAt,
                     type: kind

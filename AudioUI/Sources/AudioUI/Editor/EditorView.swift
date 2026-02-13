@@ -29,11 +29,9 @@ struct EditorView: View {
                 .frame(height: libraryHeight)
                 .padding(.horizontal, 6)
                 
-                TimelineEditorView(
-                    editorVM: editorVM
-                )
-                .frame(height: timelineHeight)
-                .padding(.horizontal, 6)
+                TimelineEditorView()
+                    .frame(height: timelineHeight)
+                    .padding(.horizontal, 6)
             }
             .frame(width: geo.size.width, height: geo.size.height)
         }
