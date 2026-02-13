@@ -9,7 +9,6 @@ import SwiftUI
 
 /// Currently Staged Content, this is the top 30% of the screen in the EditorView
 struct CurrentStagingContent: View {
-    @ObservedObject var viewModel: AudioLibraryViewModel
     @Bindable var editorVM: EditorViewModel
     
     var body: some View {

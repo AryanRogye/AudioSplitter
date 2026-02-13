@@ -12,12 +12,10 @@ import SwiftUI
 struct StagingModalContent: View {
     
     @Bindable var editorVM : EditorViewModel
-    @ObservedObject var viewModel: AudioLibraryViewModel
-    
-    @State private var selectedItem: ProcessedTrackHistoryItem? = nil
+    @State private var selectedItem: EditorFile? = nil
     
     var body: some View {
-        if viewModel.history.isEmpty {
+        if editorVM.allSongs.isEmpty {
             Text("No recents yet.")
                 .foregroundStyle(.secondary)
                 .frame(maxWidth: .infinity, alignment: .leading)
@@ -26,9 +24,9 @@ struct StagingModalContent: View {
         } else {
             ScrollView {
                 VStack(alignment: .leading, spacing: 10) {
-                    ForEach(viewModel.history.indices, id: \.self) { index in
+                    ForEach(editorVM.allSongs.indices, id: \.self) { index in
                         
-                        let item = viewModel.history[index]
+                        let item = editorVM.allSongs[index]
                         let isSelected = item == selectedItem
                         /// in the staging area
                         let isStaged = editorVM.stagedTracks.contains(item)
@@ -46,10 +44,10 @@ struct StagingModalContent: View {
                                 editorVM.addToStaged(item)
                             },
                             onRename: { newValue in
-                                viewModel.renameHistoryItem(id: item.id, newName: newValue)
+                                editorVM.renameHistoryItem(id: item.id, newName: newValue)
                             },
                             onErase: {
-                                viewModel.deleteHistoryItem(id: item.id)
+                                //                                viewModel.deleteHistoryItem(id: item.id)
                             }
                         )
                     }
@@ -60,7 +58,7 @@ struct StagingModalContent: View {
         }
     }
     
-    private func selectItemInModal(item: ProcessedTrackHistoryItem) {
+    private func selectItemInModal(item: EditorFile) {
         if selectedItem == item {
             /// if equal we set back to nil
             selectedItem = nil

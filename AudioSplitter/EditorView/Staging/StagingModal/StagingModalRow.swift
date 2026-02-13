@@ -11,7 +11,7 @@ import SwiftUI
 struct StagingModalRow: View {
     
     var isSelected: Bool
-    var item: ProcessedTrackHistoryItem
+    var item: EditorFile
     var isStaged: Bool
     var onClick: () -> Void
     var onAdd: () -> Void

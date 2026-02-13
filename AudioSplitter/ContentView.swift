@@ -196,7 +196,10 @@ struct ContentView: View {
                 }
                 ToolbarItem(placement: .topBarLeading) {
                     NavigationLink {
-                        EditorView(viewModel: libraryViewModel)
+                        EditorView(
+                            allSongs: libraryViewModel.fileUrls(),
+                            historyStore: libraryViewModel.historyStore
+                        )
                     } label: {
                         Label("Timeline", systemImage: "timeline.selection")
                     }
@@ -240,18 +243,18 @@ struct ContentView: View {
             viewModel.setPreferredStemKinds(preferredStemKinds)
             hasLoadedPreferences = true
         }
-        .onChange(of: preferredStemKinds) { newValue in
+        .onChange(of: preferredStemKinds) { _, newValue in
             preferredStemKindsStorage = encodeStemKinds(newValue)
             viewModel.setPreferredStemKinds(newValue)
         }
-        .onChange(of: viewModel.selectedFileURL) { newValue in
+        .onChange(of: viewModel.selectedFileURL) { _, newValue in
             libraryViewModel.evaluateSelectionForDuplicate(newValue)
         }
-        .onChange(of: viewModel.latestSeparatedStems) { stems in
+        .onChange(of: viewModel.latestSeparatedStems) { _, stems in
             guard let sourceURL = viewModel.latestSeparatedSourceURL else { return }
             libraryViewModel.persistProcessedTrack(sourceURL: sourceURL, stems: stems)
         }
-        .onChange(of: viewModel.isProcessing) { isProcessing in
+        .onChange(of: viewModel.isProcessing) { _, isProcessing in
             if isProcessing {
                 splitStartedAt = Date()
             } else {

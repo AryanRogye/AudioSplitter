@@ -12,9 +12,7 @@ import Playgrounds
 /// Player for each song in the staging area
 struct BundleSongPreview: View {
     
-    @Binding var selected: SelectedStageListen
-    let vocalURL : URL?
-    let instrumentalURL: URL?
+    let url: URL
     
     /// This is created per item that is staged
     @State fileprivate var vm = BundleSongPreviewViewModel()
@@ -24,13 +22,7 @@ struct BundleSongPreview: View {
             iOSAudioSlider(vm: vm)
             HStack {
                 Button {
-                    if let vocalURL, let instrumentalURL {
-                        vm.playAudio(
-                            for: selected,
-                            vocalURL,
-                            instrumentalURL
-                        )
-                    }
+                    vm.playAudio(url)
                 } label: {
                     Image(systemName: vm.preview.isPlaying ? "stop.fill" : "play.fill")
                 }

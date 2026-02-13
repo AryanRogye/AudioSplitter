@@ -7,42 +7,11 @@
 
 import SwiftUI
 
-enum SelectedStageListen {
-    case none
-    case vocal
-    case instrumental
-    
-    var stageTrackRole: StageTrackRole? {
-        switch self {
-        case .none: return nil
-        case .vocal: return .vocal
-        case .instrumental: return .instrumental
-        }
-    }
-    var kind: StemKind? {
-        switch self {
-        case .none: return nil
-        case .vocal: return .vocals
-        case .instrumental: return .instrumental
-        }
-    }
-}
-
 /// Represents each staged card in the CurrentStagingContent
 struct StagedBundleCard: View {
     
-    @State private var selected: SelectedStageListen = .none
-    let item: ProcessedTrackHistoryItem
+    let item: EditorFile
     var onRemove: () -> Void
-    
-    var vocalURL: URL? {
-        let vocals = item.stems.first(where: { $0.kind == .vocals })
-        return vocals?.fileURL
-    }
-    var instrumentalURL: URL? {
-        let instruments = item.stems.first(where: { $0.kind == .instrumental })
-        return instruments?.fileURL
-    }
     
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
@@ -77,60 +46,18 @@ struct StagedBundleCard: View {
                         .font(.system(size: 10, weight: .bold))
                         .foregroundStyle(.secondary)
                         .textCase(.uppercase)
-                    
-                    HStack(spacing: 8) {
-                        ForEach(item.stems.indices, id: \.self) { index in
-                            let stem = item.stems[index]
-                            StemBundleCardToggleButton(stem: stem, selected: $selected)
-                        }
-                    }
                 }
                 
                 Spacer()
                 
                 // Preview Control
                 BundleSongPreview(
-                    selected: $selected,
-                    vocalURL: vocalURL,
-                    instrumentalURL: instrumentalURL
+                    url: item.url
                 )
                 .padding(.bottom, 4)
             }
         }
         .padding()
         .background(RoundedRectangle(cornerRadius: 12).fill(Color(.secondarySystemBackground)))
-    }
-}
-
-#Preview {
-    StagedBundleCard(
-        item: ProcessedTrackHistoryItem(
-                id: UUID(),
-                sourceFileName: "Blow 2.wav",
-                sourceFileURL: URL(fileURLWithPath: "/System/Library/Sounds/Blow.aiff"),
-                createdAt: .now.addingTimeInterval(-3600),
-                sourceFingerprint: [0.2, 0.4, 0.7],
-                stems: [
-                    StoredStemAsset(
-                        id: UUID(),
-                        kind: .vocals,
-                        fileURL: URL(fileURLWithPath: "/System/Library/Sounds/Blow.aiff"),
-                        sourceTrackName: "Opposite",
-                        createdAt: .now,
-                        customName: "Don Toliver"
-                    ),
-                    StoredStemAsset(
-                        id: UUID(),
-                        kind: .instrumental,
-                        fileURL: URL(fileURLWithPath: "/System/Library/Sounds/Blow.aiff"),
-                        sourceTrackName: "Mo City Flexologist",
-                        createdAt: .now,
-                        customName: "Travis Scott"
-                    )
-                ],
-                customName: nil
-            )
-    ) {
-        
     }
 }

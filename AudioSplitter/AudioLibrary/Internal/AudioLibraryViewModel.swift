@@ -26,7 +26,7 @@ final class AudioLibraryViewModel: ObservableObject {
     @Published private(set) var selectedVocalDuration: Double = 0
     @Published private(set) var selectedInstrumentalDuration: Double = 0
 
-    private let historyStore: AudioHistoryStoring
+    let historyStore: AudioHistoryStoring
     private let fingerprinting: AudioFingerprinting
     private let stagePlayback: StagePlaybackControlling
     private let previewPlayback: StagePreviewPlaybackControlling
@@ -134,6 +134,35 @@ final class AudioLibraryViewModel: ObservableObject {
 
     var selectedInstrumentalAsset: StoredStemAsset? {
         availableInstrumentalAssets.first(where: { $0.id == selectedInstrumentalID })
+    }
+    
+    func fileUrls() -> [EditorFile] {
+        var files: [EditorFile] = []
+        
+        for hist in history {
+            
+            let editorFile = EditorFile(
+                hist.sourceFileURL,
+                name: hist.displayName,
+                created: hist.createdAt,
+                type: .all
+            )
+            files.append(editorFile)
+            
+            for stem in hist.stems {
+                var kind: SongType = stem.kind == .vocals ? .vocal : .instrumental
+                
+                let stemFile = EditorFile(
+                    stem.fileURL,
+                    name: stem.displayName,
+                    created: stem.createdAt,
+                    type: kind
+                )
+                files.append(stemFile)
+            }
+        }
+        
+        return files
     }
 
     func reloadHistory() {

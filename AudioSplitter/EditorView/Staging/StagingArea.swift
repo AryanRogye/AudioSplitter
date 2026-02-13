@@ -6,18 +6,17 @@
 //
 
 import SwiftUI
+import AudioUI
 
 /// StagingArea is the top 30% of the screen in the Editor View
 /// Allows us to choose songs to add from your library, drag and drop them into
 /// the timeline view, etc
 struct StagingArea: View {
     
-    @ObservedObject var viewModel: AudioLibraryViewModel
     @Bindable var editorVM: EditorViewModel
     var areaHeight: CGFloat
     
-    init(viewModel: AudioLibraryViewModel,editorVM: EditorViewModel,areaHeight: CGFloat) {
-        self.viewModel = viewModel
+    init(editorVM: EditorViewModel, areaHeight: CGFloat) {
         self.editorVM = editorVM
         self.areaHeight = areaHeight
     }
@@ -35,7 +34,6 @@ struct StagingArea: View {
             
             /// Real Content
             CurrentStagingContent(
-                viewModel: viewModel,
                 editorVM: editorVM
             )
             
@@ -43,12 +41,11 @@ struct StagingArea: View {
             DraggableBottomSheet(
                 isOpen: $editorVM.isRecentsOpen,
                 areaHeight: areaHeight - 5,
-                title: "Your Library \(viewModel.history.count)"
+                title: "Your Library \(editorVM.allSongs.count)"
             ) {
                 /// Draggable Content
                 StagingModalContent(
-                    editorVM: editorVM,
-                    viewModel: viewModel
+                    editorVM: editorVM
                 )
             }
         }
