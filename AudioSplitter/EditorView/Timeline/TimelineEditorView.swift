@@ -30,6 +30,16 @@ struct TimelineEditorView: View {
      
      */
     
+    
+    private let headerWidth: CGFloat = 80
+    private let headerSpacing: CGFloat = 10
+    private let laneHPadding: CGFloat = 8
+    
+    private var timelineLeftInset: CGFloat {
+        headerWidth + headerSpacing + laneHPadding
+    }
+    @State private var initialPlayheadTime: TimeInterval? = nil
+
     var body: some View {
         VStack(spacing: 0) {
             /// Controls For Playback, Right now only PlayPasue Button here
@@ -47,8 +57,56 @@ struct TimelineEditorView: View {
             
             Divider()
             
-            timelineContent
-            
+            ScrollView(.horizontal, showsIndicators: false) {
+                ZStack(alignment: .topLeading) { // Playhead and tracks are now in the same scrolling space
+                    
+                    timelineContent
+                    
+                    TimelineView(.animation) { _ in
+                        ZStack(alignment: .top) {
+                            // The visual playhead line
+                            Rectangle()
+                                .fill(Color.red)
+                                .frame(width: 2)
+                                .frame(maxHeight: .infinity)
+                            
+                            // A little handle at the top
+                            Image(systemName: "arrowtriangle.down.fill")
+                                .foregroundColor(.red)
+                                .offset(y: -2)
+                        }
+                        // Widen the invisible hit area
+                        .frame(width: 30)
+                        .frame(maxHeight: .infinity)
+                        .contentShape(Rectangle())
+                        // 1. Offset moves the physical hit box
+                        .offset(
+                            x: timelineLeftInset + (editorVM.timelineSong.currentTime * pixelsPerSecond) - 15,
+                            y: 20
+                        )
+                        // 2. Gesture goes HERE, attached to the moved box
+                        .highPriorityGesture(
+                            DragGesture()
+                                .onChanged { value in
+                                    print("Dragging")
+                                    if initialPlayheadTime == nil {
+                                        initialPlayheadTime = editorVM.timelineSong.currentTime
+                                    }
+                                    guard let start = initialPlayheadTime else { return }
+                                    
+                                    let timeDelta = value.translation.width / pixelsPerSecond
+                                    let newTime = max(0, start + timeDelta)
+                                    
+                                    editorVM.timelineSong.seek(to: newTime)
+                                }
+                                .onEnded { _ in
+                                    initialPlayheadTime = nil
+                                }
+                        )
+                    }
+                }
+            }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(Color(.systemGray6))
@@ -71,57 +129,41 @@ struct TimelineEditorView: View {
         .frame(maxWidth: .infinity, minHeight: 200)
     }
     
+
     private var timelineContent: some View {
         let scale = BeatScale(bpm: 120, beatsPerBar: 4, pixelsPerSecond: pixelsPerSecond)
+        let gridHeight: CGFloat = 60
+        let laneHeight: CGFloat = 60
+        let totalWidth = CGFloat(180) * pixelsPerSecond
         
-        return ScrollView(.horizontal, showsIndicators: false) {
-            VStack(alignment: .leading, spacing: 12) {
-                BeatGridView(scale: scale, totalSeconds: 180, laneHeight: 60)
-                
-                // Later: stack your lanes over the SAME width
-                // ForEach(vm.timelineSong.clips) { clip in ... }
-                ForEach(editorVM.timelineSong.clips) { clip in
-                    TimelineTrackLane(
-                        clip: clip,
-                        pixelsPerSecond: pixelsPerSecond
-                    )
-                    .contextMenu {
-                        Button(role: .destructive) {
-                            editorVM.removeURLFromSong(clip)
-                        } label: {
-                            Label("Remove Stem", systemImage: "trash")
+        
+        return ZStack(alignment: .topLeading) {
+            ScrollView(.horizontal, showsIndicators: false) {
+                VStack(alignment: .leading, spacing: 12) {
+                    ForEach(editorVM.timelineSong.clips) { clip in
+                        ZStack {
+                            BeatGridView(scale: scale, totalSeconds: 180, laneHeight: gridHeight)
+                                .padding(.leading, timelineLeftInset)
+                                .frame(width: totalWidth + timelineLeftInset)
+                                .background(Color(.tertiarySystemBackground))
+                            
+                            TimelineTrackLane(clip: clip, pixelsPerSecond: pixelsPerSecond)
+                                .frame(height: laneHeight)
+                        }
+                        .contextMenu {
+                            Button(role: .destructive) {
+                                editorVM.removeURLFromSong(clip)
+                            } label: {
+                                Label("Remove Stem", systemImage: "trash")
+                            }
                         }
                     }
                 }
+                .padding(.vertical, 20)
             }
-            .padding(.vertical, 20)
         }
+        .clipped()
     }
-    
-//    private var timelineContent: some View {
-//        ScrollView([.vertical, .horizontal], showsIndicators: false) {
-//            VStack(alignment: .leading, spacing: 12) {
-//                if vm.timelineSong.clips.isEmpty {
-//                    emptyStateView
-//                } else {
-//                    ForEach(vm.timelineSong.clips) { clip in
-//                        TimelineTrackLane(
-//                            clip: clip,
-//                            pixelsPerSecond: pixelsPerSecond
-//                        )
-//                        .contextMenu {
-//                            Button(role: .destructive) {
-//                                vm.removeURLFromSong(clip)
-//                            } label: {
-//                                Label("Remove Stem", systemImage: "trash")
-//                            }
-//                        }
-//                    }
-//                }
-//            }
-//            .padding(.vertical, 20)
-//        }
-//    }
 }
 
 struct BeatScale {
@@ -178,99 +220,113 @@ struct BeatGridView: View {
     }
 }
 
-extension TimelineEditorView {
+struct TimelineTrackLane: View {
+    @Bindable var clip: TimelineClip
+    let pixelsPerSecond: CGFloat
     
-    struct TimelineTrackLane: View {
-        // 1. Use @Bindable so we can write to it directly
-        @Bindable var clip: TimelineClip
-        let pixelsPerSecond: CGFloat
-        
-        // 2. We store the "Original" time when you start dragging
-        @State private var initialStartTime: TimeInterval? = nil
-        
-        let mockDuration: TimeInterval = 30
-        
-        var body: some View {
-            HStack(spacing: 0) {
+    @State private var initialStartTime: TimeInterval? = nil
+    @State private var length: CGFloat
+    
+    init(clip: TimelineClip, pixelsPerSecond: CGFloat) {
+        self.clip = clip
+        self.pixelsPerSecond = pixelsPerSecond
+        self.length = max(clip.duration, 0.2) * pixelsPerSecond
+    }
+    
+    var body: some View {
+        HStack(spacing: 0) {
+            
+            // --- HEADER (Pro Look) ---
+            VStack(alignment: .leading, spacing: 6) {
+                Text(clip.asset.displayName)
+                    .font(.system(size: 11, weight: .bold, design: .rounded))
+                    .lineLimit(1)
                 
-                // --- HEADER (Same as before) ---
-                VStack(alignment: .trailing, spacing: 4) {
-                    Text(clip.asset.displayName)
-                        .font(.system(size: 11, weight: .bold, design: .rounded))
-                        .lineLimit(1)
+                // Mute / Solo Button Placeholders
+                HStack(spacing: 6) {
+                    Text("M")
+                        .font(.system(size: 9, weight: .bold))
+                        .frame(width: 18, height: 18)
+                        .background(Color.gray.opacity(0.2), in: RoundedRectangle(cornerRadius: 3))
                     
-//                    Text(clip.asset.kind.rawValue.capitalized)
-//                        .font(.system(size: 9, weight: .semibold))
-//                        .foregroundStyle(clip.asset.kind == .vocals ? .blue : .green)
-//                        .padding(.horizontal, 4)
-//                        .padding(.vertical, 2)
-//                        .background(
-//                            (clip.asset.kind == .vocals ? Color.blue : Color.green).opacity(0.1),
-//                            in: Capsule()
-//                        )
+                    Text("S")
+                        .font(.system(size: 9, weight: .bold))
+                        .frame(width: 18, height: 18)
+                        .background(Color.gray.opacity(0.2), in: RoundedRectangle(cornerRadius: 3))
                 }
-                .frame(width: 80, alignment: .trailing)
-                .padding(.trailing, 10)
-                
-                // --- TIMELINE LANE ---
-                ZStack(alignment: .leading) {
-                    // Lane Background
-                    RoundedRectangle(cornerRadius: 6)
-                        .fill(Color.black.opacity(0.03))
-                        .frame(height: 50)
-                        .frame(maxWidth: .infinity)
-                    
-                    // The Clip
-                    RoundedRectangle(cornerRadius: 4)
-                        .fill(Color.blue.opacity(0.8))
-                        .frame(width: mockDuration * pixelsPerSecond, height: 40)
-                        .overlay(alignment: .leading) {
-                            HStack(spacing: 4) {
-                                Image(systemName: "hifispeaker.fill")
-                                    .font(.caption2)
-                                
-                                // Show live time update
-                                if clip.startTime > 0 {
-                                    Text("+\(clip.startTime, specifier: "%.1f")s")
-                                        .font(.caption2)
-                                        .opacity(0.8)
-                                        .monospacedDigit()
-                                }
-                            }
-                            .foregroundStyle(.white.opacity(0.9))
-                            .padding(.leading, 8)
-                        }
-                        .shadow(color: .black.opacity(0.15), radius: 3, x: 0, y: 2)
-                    
-                    // MARK: - LIVE DRAG LOGIC
-                    // We use the actual model time for the offset. No separate "dragOffset" variable.
-                        .offset(x: clip.startTime * pixelsPerSecond)
-                        .gesture(
-                            DragGesture()
-                                .onChanged { value in
-                                    // 1. Snapshot the start time if this is the first frame of the drag
-                                    if initialStartTime == nil {
-                                        initialStartTime = clip.startTime
-                                    }
-                                    
-                                    guard let start = initialStartTime else { return }
-                                    
-                                    // 2. Calculate the delta in seconds
-                                    let timeDelta = value.translation.width / pixelsPerSecond
-                                    
-                                    // 3. Update the model LIVE (Preventing negative time)
-                                    clip.startTime = max(0, start + timeDelta)
-                                }
-                                .onEnded { _ in
-                                    // 4. Clear the snapshot so the next drag starts fresh
-                                    initialStartTime = nil
-                                }
-                        )
-                }
-                .clipped()
             }
+            .frame(width: 80, alignment: .leading)
             .padding(.horizontal, 8)
-            .frame(height: 60)
+            // Optional: Give the header a slightly different background to separate it from the timeline
+            .background(Color(.systemGray6))
+            
+            // --- TIMELINE LANE ---
+            ZStack(alignment: .leading) {
+                // Lane Background
+                Rectangle()
+                    .fill(Color.black.opacity(0.04))
+                    .frame(height: 60)
+                    .frame(maxWidth: .infinity)
+                
+                // The Clip (Styled without waveforms)
+                ZStack {
+                    // Gradient background for a 3D/glassy feel
+                    RoundedRectangle(cornerRadius: 4)
+                        .fill(
+                            LinearGradient(
+                                colors: [Color.blue.opacity(0.6), Color.blue.opacity(0.8)],
+                                startPoint: .top,
+                                endPoint: .bottom
+                            )
+                        )
+                    
+                    // Subtle border
+                    RoundedRectangle(cornerRadius: 4)
+                        .stroke(Color.white.opacity(0.3), lineWidth: 1)
+                    
+                    // Fake "stereo" center split line common in DAWs
+                    Rectangle()
+                        .fill(Color.white.opacity(0.2))
+                        .frame(height: 1)
+                }
+                .frame(width: length, height: 48) // Slightly shorter than the lane for padding
+                .overlay(alignment: .topLeading) {
+                    HStack(spacing: 4) {
+                        Image(systemName: "waveform")
+                            .font(.system(size: 9))
+                        
+                        if clip.startTime > 0 {
+                            Text("\(clip.startTime, specifier: "%.1f")s")
+                                .font(.system(size: 9, design: .monospaced))
+                        }
+                    }
+                    .foregroundStyle(.white.opacity(0.9))
+                    .padding(6)
+                }
+                .shadow(color: .black.opacity(0.2), radius: 2, x: 0, y: 1)
+                
+                // MARK: - LIVE DRAG LOGIC
+                .offset(x: clip.startTime * pixelsPerSecond)
+                .gesture(
+                    DragGesture()
+                        .onChanged { value in
+                            if initialStartTime == nil {
+                                initialStartTime = clip.startTime
+                            }
+                            guard let start = initialStartTime else { return }
+                            let timeDelta = value.translation.width / pixelsPerSecond
+                            clip.startTime = max(0, start + timeDelta)
+                        }
+                        .onEnded { _ in
+                            initialStartTime = nil
+                        }
+                )
+            }
+            .clipped()
+        }
+        // Add a bottom divider to clearly separate lanes vertically
+        .overlay(alignment: .bottom) {
+            Divider()
         }
     }
 }

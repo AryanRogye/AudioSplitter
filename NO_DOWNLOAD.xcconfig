@@ -1,0 +1,10 @@
+//
+//  NO_DOWNLOAD.xcconfig
+//  AudioSplitter
+//
+//  Created by Aryan Rogye on 2/13/26.
+//
+
+// Configuration settings file format documentation can be found at:
+// https://developer.apple.com/documentation/xcode/adding-a-build-configuration-file-to-your-project
+SWIFT_ACTIVE_COMPILATION_CONDITIONS = $(inherited) NO_DOWNLOAD_VIEW

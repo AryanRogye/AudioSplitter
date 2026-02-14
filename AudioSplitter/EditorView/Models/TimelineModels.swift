@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import AVFoundation
 
 enum TransportState {
     case stopped
@@ -18,10 +19,20 @@ enum TransportState {
 class TimelineClip: Identifiable {
     let id = UUID()
     let asset: EditorFile
-    var startTime: TimeInterval = 0.0 // This is the delay in seconds
+    var startTime: TimeInterval = 0.0
+    var audio = AVAudioPreviewPlayback()
+    var duration: TimeInterval = 0
     
-    nonisolated init(asset: EditorFile) {
+    init(asset: EditorFile) async {
         self.asset = asset
+        await calcDuration()
+    }
+    
+    private func calcDuration() async {
+        let ass = AVURLAsset(url: asset.url)
+        if let dur = try? await ass.load(.duration) {
+            self.duration = dur.seconds
+        }
     }
 }
 
@@ -30,37 +41,76 @@ class TimelineClip: Identifiable {
 class TimelineSong {
     /// NO map because we may want multiple of the same URLs
     var clips: [TimelineClip] = []
-    var audios: [AVAudioPreviewPlayback] = []
     
     private var startTime: Date?
     private var accumulatedTime: TimeInterval = 0
     private var transportState: TransportState = .stopped
+    private var scheduled: [UUID: Task<Void, Never>] = [:]
+    
+    var duration: TimeInterval = 0
+
+    var isRunning: Bool {
+        transportState == .playing
+    }
+    
+    var currentTime: TimeInterval {
+        switch transportState {
+        case .playing:
+            guard let startTime else { return accumulatedTime }
+            return accumulatedTime + Date().timeIntervalSince(startTime)
+        case .paused, .stopped:
+            return accumulatedTime
+        }
+    }
     
     public func assign(_ items: [EditorFile]) {
-        Task.detached(priority: .userInitiated) {
+        Task(priority: .userInitiated) {
             var clips: [TimelineClip] = []
             
             /// Each stem has a file url which gets added into `addedURLs`
             /// when we call play this will bundle up all and toggle play on them
             for file in items {
-                let clip = TimelineClip(asset: file)
+                let clip = await TimelineClip(asset: file)
                 clips.append(clip)
             }
             
             await MainActor.run { [clips] in
                 self.clips.append(contentsOf: clips)
-                self.seedAudio()
+            }
+        }
+    }
+    
+    public func seek(to time: TimeInterval) {
+        let wasPlaying = isRunning
+        
+        // Pause everything to clear existing scheduled tasks
+        if wasPlaying {
+            try? pause()
+        }
+        
+        // Set the new time
+        accumulatedTime = max(0, time)
+        
+        // Resume if it was already playing, otherwise update the paused audio engines
+        if wasPlaying {
+            try? play()
+        } else {
+            for clip in clips {
+                let seekTime = accumulatedTime - clip.startTime
+                if seekTime >= 0 {
+                    clip.audio.seek(to: seekTime)
+                } else {
+                    clip.audio.seek(to: 0)
+                }
             }
         }
     }
     
     public func remove(_ clip: TimelineClip) {
+        scheduled[clip.id]?.cancel()
+        scheduled[clip.id] = nil
+        clip.audio.pause()
         clips.removeAll { $0.id == clip.id }
-        seedAudio()
-    }
-
-    var isRunning: Bool {
-        transportState == .playing
     }
     
     public func play() throws {
@@ -68,22 +118,19 @@ class TimelineSong {
         if transportState == .playing { return }
         transportState = .playing
         if startTime == nil { startTime = Date() }
-        let count = min(audios.count, clips.count)
         
-        for i in 0..<count {
-            let audio = audios[i]
-            let clip  = clips[i]
-            
-            Task {
+        for clip in clips {
+            scheduled[clip.id]?.cancel()
+            scheduled[clip.id] = Task {
                 let sessionTime = accumulatedTime
-                
                 if sessionTime < clip.startTime {
                     let delay = clip.startTime - sessionTime
                     try? await Task.sleep(nanoseconds: UInt64(delay * 1_000_000_000))
-                    try self.playAudio(previewAudio: audio, url: clip.asset.url, time: 0)
+                    if Task.isCancelled { return }
+                    try? self.playAudio(previewAudio: clip.audio, url: clip.asset.url, time: 0)
                 } else {
                     let seek = sessionTime - clip.startTime
-                    try self.playAudio(previewAudio: audio, url: clip.asset.url, time: seek)
+                    try? self.playAudio(previewAudio: clip.audio, url: clip.asset.url, time: seek)
                 }
             }
         }
@@ -91,10 +138,8 @@ class TimelineSong {
     
     public func pause() throws {
         transportState = .paused
-        for audio in audios {
-            Task {
-                audio.pause()
-            }
+        for clip in clips {
+            Task { clip.audio.pause() }
         }
         
         if let startTime = startTime {
@@ -102,21 +147,26 @@ class TimelineSong {
             accumulatedTime += Date().timeIntervalSince(startTime)
             self.startTime = nil
         }
+        
+        for (_, t) in scheduled { t.cancel() }
+        scheduled.removeAll()
     }
     
     private func playAudio(previewAudio: AVAudioPreviewPlayback, url: URL, time: TimeInterval) throws {
         try previewAudio.togglePreview(fileURL: url, startTime: time)
     }
     
-    /// Function Seeds after audio is changed based on addedURLs
-    private func seedAudio() {
+    public func stop() {
+        for (_, t) in scheduled { t.cancel() }
+        scheduled.removeAll()
+
         transportState = .stopped
-        audios.removeAll()
         startTime = nil
-        accumulatedTime = .zero
-        for _ in clips {
-            let previewAudio = AVAudioPreviewPlayback()
-            audios.append(previewAudio)
+        accumulatedTime = 0
+        
+        for clip in clips {
+            clip.audio.pause()
+            clip.audio.seek(to: 0)
         }
     }
 }

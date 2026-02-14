@@ -187,6 +187,8 @@ struct ContentView: View {
             .animation(.spring(response: 0.62, dampingFraction: 0.86), value: viewModel.isProcessing)
             .animation(.spring(response: 0.58, dampingFraction: 0.86), value: viewModel.outputStems.map(\.kind))
             .toolbar {
+#if NO_DOWNLOAD_VIEW
+#else
                 ToolbarItem(placement: .topBarLeading) {
                     NavigationLink {
                         DownloaderView()
@@ -194,6 +196,7 @@ struct ContentView: View {
                         Label("Download", systemImage: "arrow.down.circle")
                     }
                 }
+#endif
                 ToolbarItem(placement: .topBarLeading) {
                     NavigationLink {
                         EditorView(
