@@ -5,6 +5,7 @@
 //  Created by Aryan Rogye on 2/10/26.
 //
 
+#if !NO_DOWNLOAD
 import SwiftUI
 import YoutubeDL
 import PythonKit
@@ -410,3 +411,5 @@ private enum DownloadFlowError: LocalizedError {
 extension URL: @retroactive Identifiable {
     public var id: String { self.path }
 }
+
+#endif

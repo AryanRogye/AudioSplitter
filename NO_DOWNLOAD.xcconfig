@@ -7,4 +7,4 @@
 
 // Configuration settings file format documentation can be found at:
 // https://developer.apple.com/documentation/xcode/adding-a-build-configuration-file-to-your-project
-SWIFT_ACTIVE_COMPILATION_CONDITIONS = $(inherited) NO_DOWNLOAD_VIEW
+SWIFT_ACTIVE_COMPILATION_CONDITIONS = $(inherited) NO_DOWNLOAD

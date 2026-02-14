@@ -5,6 +5,7 @@
 //  Created by Aryan Rogye on 2/10/26.
 //
 
+#if !NO_DOWNLOAD
 import SwiftUI
 import FFmpegSupport
 
@@ -93,3 +94,5 @@ struct ConverterView: View {
         }
     }
 }
+
+#endif
