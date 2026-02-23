@@ -15,9 +15,9 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "9BB7997A2F37DA82002526E6"
-               BuildableName = "AudioSplitter.app"
-               BlueprintName = "AudioSplitter"
+               BlueprintIdentifier = "9BF40BF62F413A43005FB27C"
+               BuildableName = "NO_DOWNLOAD.app"
+               BlueprintName = "NO_DOWNLOAD"
                ReferencedContainer = "container:AudioSplitter.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -50,18 +50,9 @@
             ReferencedContainer = "container:AudioSplitter.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
-      <MacroExpansion>
-         <BuildableReference
-            BuildableIdentifier = "primary"
-            BlueprintIdentifier = "9BB7997A2F37DA82002526E6"
-            BuildableName = "AudioSplitter.app"
-            BlueprintName = "AudioSplitter"
-            ReferencedContainer = "container:AudioSplitter.xcodeproj">
-         </BuildableReference>
-      </MacroExpansion>
    </LaunchAction>
    <ProfileAction
-      buildConfiguration = "Release"
+      buildConfiguration = "NO_DOWNLOAD"
       shouldUseLaunchSchemeArgsEnv = "YES"
       savedToolIdentifier = ""
       useCustomWorkingDirectory = "NO"
@@ -70,18 +61,18 @@
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "9BB7997A2F37DA82002526E6"
-            BuildableName = "AudioSplitter.app"
-            BlueprintName = "AudioSplitter"
+            BlueprintIdentifier = "9BF40BF62F413A43005FB27C"
+            BuildableName = "NO_DOWNLOAD.app"
+            BlueprintName = "NO_DOWNLOAD"
             ReferencedContainer = "container:AudioSplitter.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </ProfileAction>
    <AnalyzeAction
-      buildConfiguration = "Debug">
+      buildConfiguration = "NO_DOWNLOAD">
    </AnalyzeAction>
    <ArchiveAction
-      buildConfiguration = "Release"
+      buildConfiguration = "NO_DOWNLOAD"
       revealArchiveInOrganizer = "YES">
    </ArchiveAction>
 </Scheme>

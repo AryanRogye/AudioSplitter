@@ -35,6 +35,13 @@
 		9BF40C552F413A67005FB27C /* DraggableBottomSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9BF40C242F413A67005FB27C /* DraggableBottomSheet.swift */; };
 		9BF40C562F413A67005FB27C /* StagingArea.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9BF40C252F413A67005FB27C /* StagingArea.swift */; };
 		9BF40C572F413A67005FB27C /* TimelineEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9BF40C272F413A67005FB27C /* TimelineEditorView.swift */; };
+		9C0A00112F500001005FB27C /* TimelinePlaybackControls.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C0A00012F500001005FB27C /* TimelinePlaybackControls.swift */; };
+		9C0A00122F500001005FB27C /* TimelinePlayhead.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C0A00022F500001005FB27C /* TimelinePlayhead.swift */; };
+		9C0A00132F500001005FB27C /* TimelineContent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C0A00032F500001005FB27C /* TimelineContent.swift */; };
+		9C0A00142F500001005FB27C /* BeatScale.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C0A00052F500001005FB27C /* BeatScale.swift */; };
+		9C0A00152F500001005FB27C /* BeatGridView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C0A00062F500001005FB27C /* BeatGridView.swift */; };
+		9C0A00162F500001005FB27C /* TimelineTrackLane.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C0A00082F500001005FB27C /* TimelineTrackLane.swift */; };
+		9C0A00172F500001005FB27C /* WaveformShape.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C0A00092F500001005FB27C /* WaveformShape.swift */; };
 		9BF40C582F413A67005FB27C /* EditorViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9BF40C292F413A67005FB27C /* EditorViewModel.swift */; };
 		9BF40C592F413A67005FB27C /* EditorViewModel+Renaming.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9BF40C2A2F413A67005FB27C /* EditorViewModel+Renaming.swift */; };
 		9BF40C5A2F413A67005FB27C /* EditorViewModel+Staging.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9BF40C2B2F413A67005FB27C /* EditorViewModel+Staging.swift */; };
@@ -69,6 +76,13 @@
 		9BF40D172F413AEC005FB27C /* EditorViewModel+Timeline.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9BF40C2C2F413A67005FB27C /* EditorViewModel+Timeline.swift */; };
 		9BF40D182F413AEC005FB27C /* BundleSongPreviewViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9BF40C192F413A67005FB27C /* BundleSongPreviewViewModel.swift */; };
 		9BF40D192F413AEC005FB27C /* TimelineEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9BF40C272F413A67005FB27C /* TimelineEditorView.swift */; };
+		9C0A00212F500001005FB27C /* TimelinePlaybackControls.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C0A00012F500001005FB27C /* TimelinePlaybackControls.swift */; };
+		9C0A00222F500001005FB27C /* TimelinePlayhead.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C0A00022F500001005FB27C /* TimelinePlayhead.swift */; };
+		9C0A00232F500001005FB27C /* TimelineContent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C0A00032F500001005FB27C /* TimelineContent.swift */; };
+		9C0A00242F500001005FB27C /* BeatScale.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C0A00052F500001005FB27C /* BeatScale.swift */; };
+		9C0A00252F500001005FB27C /* BeatGridView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C0A00062F500001005FB27C /* BeatGridView.swift */; };
+		9C0A00262F500001005FB27C /* TimelineTrackLane.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C0A00082F500001005FB27C /* TimelineTrackLane.swift */; };
+		9C0A00272F500001005FB27C /* WaveformShape.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C0A00092F500001005FB27C /* WaveformShape.swift */; };
 		9BF40D1A2F413AEC005FB27C /* StagingArea.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9BF40C252F413A67005FB27C /* StagingArea.swift */; };
 		9BF40D1B2F413AEC005FB27C /* DraggableBottomSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9BF40C242F413A67005FB27C /* DraggableBottomSheet.swift */; };
 		9BF40D1C2F413AEC005FB27C /* TimelineModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9BF40C162F413A67005FB27C /* TimelineModels.swift */; };
@@ -122,6 +136,13 @@
 		9BF40C242F413A67005FB27C /* DraggableBottomSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DraggableBottomSheet.swift; sourceTree = "<group>"; };
 		9BF40C252F413A67005FB27C /* StagingArea.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StagingArea.swift; sourceTree = "<group>"; };
 		9BF40C272F413A67005FB27C /* TimelineEditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimelineEditorView.swift; sourceTree = "<group>"; };
+		9C0A00012F500001005FB27C /* TimelinePlaybackControls.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimelinePlaybackControls.swift; sourceTree = "<group>"; };
+		9C0A00022F500001005FB27C /* TimelinePlayhead.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimelinePlayhead.swift; sourceTree = "<group>"; };
+		9C0A00032F500001005FB27C /* TimelineContent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimelineContent.swift; sourceTree = "<group>"; };
+		9C0A00052F500001005FB27C /* BeatScale.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BeatScale.swift; sourceTree = "<group>"; };
+		9C0A00062F500001005FB27C /* BeatGridView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BeatGridView.swift; sourceTree = "<group>"; };
+		9C0A00082F500001005FB27C /* TimelineTrackLane.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimelineTrackLane.swift; sourceTree = "<group>"; };
+		9C0A00092F500001005FB27C /* WaveformShape.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WaveformShape.swift; sourceTree = "<group>"; };
 		9BF40C292F413A67005FB27C /* EditorViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditorViewModel.swift; sourceTree = "<group>"; };
 		9BF40C2A2F413A67005FB27C /* EditorViewModel+Renaming.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "EditorViewModel+Renaming.swift"; sourceTree = "<group>"; };
 		9BF40C2B2F413A67005FB27C /* EditorViewModel+Staging.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "EditorViewModel+Staging.swift"; sourceTree = "<group>"; };
@@ -286,10 +307,33 @@
 			path = Staging;
 			sourceTree = "<group>";
 		};
+		9C0A000A2F500001005FB27C /* TimelineGrid */ = {
+			isa = PBXGroup;
+			children = (
+				9C0A00052F500001005FB27C /* BeatScale.swift */,
+				9C0A00062F500001005FB27C /* BeatGridView.swift */,
+			);
+			path = TimelineGrid;
+			sourceTree = "<group>";
+		};
+		9C0A000B2F500001005FB27C /* TimelineTrack */ = {
+			isa = PBXGroup;
+			children = (
+				9C0A00082F500001005FB27C /* TimelineTrackLane.swift */,
+				9C0A00092F500001005FB27C /* WaveformShape.swift */,
+			);
+			path = TimelineTrack;
+			sourceTree = "<group>";
+		};
 		9BF40C282F413A67005FB27C /* Timeline */ = {
 			isa = PBXGroup;
 			children = (
+				9C0A000A2F500001005FB27C /* TimelineGrid */,
+				9C0A000B2F500001005FB27C /* TimelineTrack */,
 				9BF40C272F413A67005FB27C /* TimelineEditorView.swift */,
+				9C0A00012F500001005FB27C /* TimelinePlaybackControls.swift */,
+				9C0A00022F500001005FB27C /* TimelinePlayhead.swift */,
+				9C0A00032F500001005FB27C /* TimelineContent.swift */,
 			);
 			path = Timeline;
 			sourceTree = "<group>";
@@ -498,6 +542,13 @@
 				9BF40C552F413A67005FB27C /* DraggableBottomSheet.swift in Sources */,
 				9BF40C562F413A67005FB27C /* StagingArea.swift in Sources */,
 				9BF40C572F413A67005FB27C /* TimelineEditorView.swift in Sources */,
+				9C0A00112F500001005FB27C /* TimelinePlaybackControls.swift in Sources */,
+				9C0A00122F500001005FB27C /* TimelinePlayhead.swift in Sources */,
+				9C0A00132F500001005FB27C /* TimelineContent.swift in Sources */,
+				9C0A00142F500001005FB27C /* BeatScale.swift in Sources */,
+				9C0A00152F500001005FB27C /* BeatGridView.swift in Sources */,
+				9C0A00162F500001005FB27C /* TimelineTrackLane.swift in Sources */,
+				9C0A00172F500001005FB27C /* WaveformShape.swift in Sources */,
 				9BF40C582F413A67005FB27C /* EditorViewModel.swift in Sources */,
 				9BF40C592F413A67005FB27C /* EditorViewModel+Renaming.swift in Sources */,
 				9BF40C5A2F413A67005FB27C /* EditorViewModel+Staging.swift in Sources */,
@@ -533,6 +584,13 @@
 				9BF40D172F413AEC005FB27C /* EditorViewModel+Timeline.swift in Sources */,
 				9BF40D182F413AEC005FB27C /* BundleSongPreviewViewModel.swift in Sources */,
 				9BF40D192F413AEC005FB27C /* TimelineEditorView.swift in Sources */,
+				9C0A00212F500001005FB27C /* TimelinePlaybackControls.swift in Sources */,
+				9C0A00222F500001005FB27C /* TimelinePlayhead.swift in Sources */,
+				9C0A00232F500001005FB27C /* TimelineContent.swift in Sources */,
+				9C0A00242F500001005FB27C /* BeatScale.swift in Sources */,
+				9C0A00252F500001005FB27C /* BeatGridView.swift in Sources */,
+				9C0A00262F500001005FB27C /* TimelineTrackLane.swift in Sources */,
+				9C0A00272F500001005FB27C /* WaveformShape.swift in Sources */,
 				9BF40D1A2F413AEC005FB27C /* StagingArea.swift in Sources */,
 				9BF40D1B2F413AEC005FB27C /* DraggableBottomSheet.swift in Sources */,
 				9BF40D1C2F413AEC005FB27C /* TimelineModels.swift in Sources */,
