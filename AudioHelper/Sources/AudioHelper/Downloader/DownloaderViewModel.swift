@@ -52,6 +52,66 @@ final class CaptureBox: Sendable {
     var latestFilename: String? = nil
 }
 
+private actor DownloadProgressTracker {
+    private var lastStatus: String?
+    private var lastFilename: String?
+    private var lastProgressStep: Int = -1
+
+    func consume(
+        status: String,
+        filename: String?,
+        percentText: String?,
+        speedText: String?,
+        etaText: String?
+    ) -> (messages: [String], progressLabel: String?) {
+        var messages: [String] = []
+        var progressLabel: String?
+
+        if let filename, !filename.isEmpty, filename != lastFilename {
+            lastFilename = filename
+            messages.append("Output: \(URL(fileURLWithPath: filename).lastPathComponent)")
+        }
+
+        if status != lastStatus {
+            lastStatus = status
+            switch status {
+            case "downloading":
+                messages.append("Download started")
+            case "finished":
+                messages.append("Download finished, processing output...")
+            case "error":
+                messages.append("yt-dlp reported an error state")
+            default:
+                messages.append("yt-dlp status: \(status)")
+            }
+        }
+
+        if status == "downloading", let percent = parsePercent(percentText) {
+            let step = max(0, min(100, (Int(percent) / 10) * 10))
+            if step > lastProgressStep {
+                lastProgressStep = step
+                let speed = speedText?.trimmingCharacters(in: .whitespacesAndNewlines)
+                let eta = etaText?.trimmingCharacters(in: .whitespacesAndNewlines)
+                var extras: [String] = []
+                if let speed, !speed.isEmpty { extras.append(speed) }
+                if let eta, !eta.isEmpty { extras.append("ETA \(eta)") }
+                let suffix = extras.isEmpty ? "" : " (\(extras.joined(separator: ", ")))"
+                messages.append("Progress \(step)%\(suffix)")
+            }
+            progressLabel = "Downloading... \(Int(percent))%"
+        }
+
+        return (messages, progressLabel)
+    }
+
+    private func parsePercent(_ percentText: String?) -> Double? {
+        guard let percentText else { return nil }
+        let filtered = percentText.filter { $0.isNumber || $0 == "." }
+        guard !filtered.isEmpty else { return nil }
+        return Double(filtered)
+    }
+}
+
 @MainActor
 public final class DownloaderViewModel: ObservableObject {
     @Published public var urlString: String = ""
@@ -92,6 +152,7 @@ public final class DownloaderViewModel: ObservableObject {
 
     public func downloadSong() async {
         guard !isDownloading else { return }
+        let baselineFileCount = downloadedFiles.count
 
         let trimmedURL = urlString.trimmingCharacters(in: .whitespacesAndNewlines)
         guard let userURL = URL(string: trimmedURL) else {
@@ -118,11 +179,18 @@ public final class DownloaderViewModel: ObservableObject {
 
             statusMessage = "Finalizing file..."
             let confirmedURL = await waitForFile(at: downloadedURL)
-            refreshFiles(preferred: confirmedURL ?? downloadedURL)
+            let preferredURL = confirmedURL ?? downloadedURL
+            let listUpdated = await refreshFilesUntilVisible(
+                preferred: preferredURL,
+                baselineCount: baselineFileCount
+            )
 
-            if confirmedURL != nil {
+            if confirmedURL != nil && listUpdated {
                 statusMessage = "Download Successful!"
                 appendLog("Saved: \(downloadedURL.lastPathComponent)")
+            } else if confirmedURL != nil {
+                statusMessage = "Download successful, list is syncing..."
+                appendLog("Download saved, waiting for list sync: \(downloadedURL.lastPathComponent)")
             } else {
                 statusMessage = "Download finished, but file is still syncing. Try refresh in a moment."
                 appendLog("Download finished but file sync is delayed: \(downloadedURL.lastPathComponent)")
@@ -223,6 +291,29 @@ public final class DownloaderViewModel: ObservableObject {
         appendLog("Using bundled yt-dlp module")
     }
 
+    private func refreshFilesUntilVisible(
+        preferred: URL?,
+        baselineCount: Int,
+        attempts: Int = 10,
+        delayNs: UInt64 = 400_000_000
+    ) async -> Bool {
+        for attempt in 0..<attempts {
+            refreshFiles(preferred: preferred)
+
+            if let preferred, downloadedFiles.contains(preferred) {
+                return true
+            }
+            if downloadedFiles.count > baselineCount {
+                return true
+            }
+
+            if attempt < attempts - 1 {
+                try? await Task.sleep(nanoseconds: delayNs)
+            }
+        }
+        return false
+    }
+
     private func waitForFile(at url: URL, attempts: Int = 12, delayNs: UInt64 = 250_000_000) async -> URL? {
         let fileManager = FileManager.default
 
@@ -243,6 +334,7 @@ public final class DownloaderViewModel: ObservableObject {
         try FileManager.default.createDirectory(at: outputDirectory, withIntermediateDirectories: true)
         let startDate = Date()
         let capture = CaptureBox()
+        let progressTracker = DownloadProgressTracker()
 
         let args = [
             "--no-playlist",
@@ -259,16 +351,30 @@ public final class DownloaderViewModel: ObservableObject {
             argv: args,
             progress: { @Sendable dict in
                 guard let status = dict["status"].flatMap({ String($0) }) else { return }
+                let filename = dict["filename"].flatMap({ String($0) })
+                let percentText = dict["_percent_str"].flatMap({ String($0) })
+                let speedText = dict["_speed_str"].flatMap({ String($0) })
+                let etaText = dict["_eta_str"].flatMap({ String($0) })
 
-                if let filename = dict["filename"].flatMap({ String($0) }), !filename.isEmpty {
-                    Task { @MainActor in
-                        capture.latestFilename = filename
-                    }
-                }
+                Task {
+                    let update = await progressTracker.consume(
+                        status: status,
+                        filename: filename,
+                        percentText: percentText,
+                        speedText: speedText,
+                        etaText: etaText
+                    )
 
-                if status == "finished" {
-                    Task { @MainActor in
-                        self.appendLog("Download finished, processing output...")
+                    await MainActor.run {
+                        if let filename, !filename.isEmpty {
+                            capture.latestFilename = filename
+                        }
+                        if let progressLabel = update.progressLabel {
+                            self.statusMessage = progressLabel
+                        }
+                        for message in update.messages {
+                            self.appendLog(message)
+                        }
                     }
                 }
             }
