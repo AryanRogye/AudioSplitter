@@ -27,6 +27,10 @@ let package = Package(
         .package(
             url: "https://github.com/pvieito/PythonKit.git",
             from: "0.3.1"
+        ),
+        .package(
+            url: "https://github.com/kewlbear/Python-iOS.git",
+            from: "0.1.1-b"
         )
     ],
     targets: [
@@ -37,7 +41,8 @@ let package = Package(
             dependencies: [
                 .product(name: "FluidAudio", package: "FluidAudio"),
                 .product(name: "YoutubeDL", package: "YoutubeDL-iOS"),
-                .product(name: "PythonKit", package: "PythonKit")
+                .product(name: "PythonKit", package: "PythonKit"),
+                .product(name: "Python-iOS", package: "Python-iOS")
             ],
             resources: [
                 .process("Resources")

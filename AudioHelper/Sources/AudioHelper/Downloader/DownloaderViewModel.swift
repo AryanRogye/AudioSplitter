@@ -2,6 +2,50 @@ import Foundation
 import SwiftUI
 import YoutubeDL
 import PythonKit
+import PythonSupport
+
+@_silgen_name("_PyImport_IsInitialized")
+private func _PyImport_IsInitialized() -> Int32
+
+@_silgen_name("PyCMethod_New")
+private func _PyCMethod_New(
+    _ methodDef: UnsafeMutableRawPointer?,
+    _ selfObject: UnsafeMutableRawPointer?,
+    _ module: UnsafeMutableRawPointer?,
+    _ cls: UnsafeMutableRawPointer?
+) -> UnsafeMutableRawPointer?
+
+@_silgen_name("PyMethod_New")
+private func _PyMethod_New(
+    _ function: UnsafeMutableRawPointer?,
+    _ selfObject: UnsafeMutableRawPointer?
+) -> UnsafeMutableRawPointer?
+
+// YoutubeDL-iOS resolves `Py_IsInitialized` using `dlsym`. In Release, that
+// symbol is missing by default, which makes the resolved function pointer nil.
+// Exporting this shim keeps the lookup valid and prevents a null jump at runtime.
+@_cdecl("Py_IsInitialized")
+public func audioHelperPyIsInitializedShim() -> Int32 {
+    _PyImport_IsInitialized()
+}
+
+// PythonKit lazily loads these symbols with `dlsym`. Python-iOS on iOS 26 only
+// exports adjacent APIs, so we forward these calls to equivalent exported APIs.
+@_cdecl("PyCFunction_NewEx")
+public func audioHelperPyCFunctionNewExShim(
+    _ methodDef: UnsafeMutableRawPointer?,
+    _ selfObject: UnsafeMutableRawPointer?,
+    _ module: UnsafeMutableRawPointer?
+) -> UnsafeMutableRawPointer? {
+    _PyCMethod_New(methodDef, selfObject, module, nil)
+}
+
+@_cdecl("PyInstanceMethod_New")
+public func audioHelperPyInstanceMethodNewShim(
+    _ function: UnsafeMutableRawPointer?
+) -> UnsafeMutableRawPointer? {
+    _PyMethod_New(function, nil)
+}
 
 @MainActor
 final class CaptureBox: Sendable {
@@ -22,6 +66,7 @@ public final class DownloaderViewModel: ObservableObject {
     private let supportedDownloadExtensions: Set<String> = [
         "aac", "flac", "m4a", "m4b", "mp3", "mp4", "ogg", "oga", "opus", "wav", "webm"
     ]
+    private var didConfigureBundledYtDlp = false
 
     public init() {}
 
@@ -65,8 +110,8 @@ public final class DownloaderViewModel: ObservableObject {
         appendLog("Preparing download for \(url.absoluteString)")
 
         do {
-            try await YoutubeDL.downloadPythonModule()
-            appendLog("yt-dlp module ready")
+            try configureBundledYtDlpIfNeeded()
+            appendLog("yt-dlp module ready (bundled)")
             statusMessage = "Downloading..."
 
             let downloadedURL = try await downloadViaYtDlp(url: url)
@@ -146,6 +191,37 @@ public final class DownloaderViewModel: ObservableObject {
         let stem = fileURL.deletingPathExtension().lastPathComponent.lowercased()
         return stem.contains("-audioonly")
     }
+    
+    private func configureBundledYtDlpIfNeeded() throws {
+        guard !didConfigureBundledYtDlp else { return }
+        guard let bundledModuleURL = Bundle.module.url(forResource: "yt_dlp", withExtension: nil) else {
+            throw DownloadFlowError.bundledModuleMissing
+        }
+        
+        let fileManager = FileManager.default
+        guard let appSupport = fileManager.urls(for: .applicationSupportDirectory, in: .userDomainMask).first else {
+            throw DownloadFlowError.bundledModuleInstallFailed
+        }
+        
+        let destinationDirectory = appSupport.appendingPathComponent("io.github.kewlbear.youtubedl-ios", isDirectory: true)
+        let destinationURL = destinationDirectory.appendingPathComponent("yt_dlp")
+        
+        try fileManager.createDirectory(at: destinationDirectory, withIntermediateDirectories: true)
+        if fileManager.fileExists(atPath: destinationURL.path) {
+            try fileManager.removeItem(at: destinationURL)
+        }
+        try fileManager.copyItem(at: bundledModuleURL, to: destinationURL)
+        
+        PythonSupport.initialize()
+        PythonSupport.runSimpleString("""
+            import sys, types
+            if 'ctypes' not in sys.modules:
+                sys.modules['ctypes'] = types.ModuleType('ctypes')
+            """)
+        
+        didConfigureBundledYtDlp = true
+        appendLog("Using bundled yt-dlp module")
+    }
 
     private func waitForFile(at url: URL, attempts: Int = 12, delayNs: UInt64 = 250_000_000) async -> URL? {
         let fileManager = FileManager.default
@@ -166,7 +242,6 @@ public final class DownloaderViewModel: ObservableObject {
         let outputDirectory = ydl.downloadsDirectory
         try FileManager.default.createDirectory(at: outputDirectory, withIntermediateDirectories: true)
         let startDate = Date()
-
         let capture = CaptureBox()
 
         let args = [
@@ -195,14 +270,6 @@ public final class DownloaderViewModel: ObservableObject {
                     Task { @MainActor in
                         self.appendLog("Download finished, processing output...")
                     }
-                }
-            },
-            log: { @Sendable level, message in
-                guard level == "warning" || level == "error" else { return }
-                let levelStr = String(level)
-                let messageStr = String(message)
-                Task { @MainActor in
-                    self.appendLog("[\(levelStr.uppercased())] \(messageStr)")
                 }
             }
         )
@@ -301,11 +368,17 @@ public final class DownloaderViewModel: ObservableObject {
 
 private enum DownloadFlowError: LocalizedError {
     case outputNotFound
+    case bundledModuleMissing
+    case bundledModuleInstallFailed
 
     var errorDescription: String? {
         switch self {
         case .outputNotFound:
             return "Download finished but output file was not found."
+        case .bundledModuleMissing:
+            return "Bundled yt-dlp module is missing from AudioHelper resources."
+        case .bundledModuleInstallFailed:
+            return "Unable to prepare bundled yt-dlp module in Application Support."
         }
     }
 }
