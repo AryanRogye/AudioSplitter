@@ -15,15 +15,33 @@ let package = Package(
             targets: ["AudioHelper"]
         ),
     ],
+    dependencies: [
+        .package(
+            url: "https://github.com/FluidInference/FluidAudio.git",
+            revision: "8e830ab2dbaf89b62659d37428b47a47056d1449"
+        ),
+        .package(
+            url: "https://github.com/kewlbear/YoutubeDL-iOS.git",
+            from: "0.0.2"
+        ),
+        .package(
+            url: "https://github.com/pvieito/PythonKit.git",
+            from: "0.3.1"
+        )
+    ],
     targets: [
         // Targets are the basic building blocks of a package, defining a module or a test suite.
         // Targets can depend on other targets in this package and products from dependencies.
         .target(
             name: "AudioHelper",
+            dependencies: [
+                .product(name: "FluidAudio", package: "FluidAudio"),
+                .product(name: "YoutubeDL", package: "YoutubeDL-iOS"),
+                .product(name: "PythonKit", package: "PythonKit")
+            ],
             resources: [
                 .process("Resources")
             ]
         ),
-
     ]
 )

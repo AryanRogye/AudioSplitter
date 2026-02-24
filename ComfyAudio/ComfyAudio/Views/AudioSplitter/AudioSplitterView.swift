@@ -12,6 +12,7 @@ import UniformTypeIdentifiers
 struct AudioSplitterView: View {
     
     @State private var isFileImporterPresented = false
+    @State private var isHelpPresented = false
     @State private var vm = AudioSplitterViewModel(
         files: AudioFileManager(
             configuration: .init(
@@ -48,7 +49,7 @@ struct AudioSplitterView: View {
                     
                     /// Save Stem View
                     saveStemsView
-                        .padding(.horizontal)
+                        .padding([.horizontal, .top])
                         .padding(.bottom, 32)
                 }
                 .frame(
@@ -95,14 +96,29 @@ struct AudioSplitterView: View {
             .animation(.spring(), value: vm.statusText)
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
-                    NavigationLink {
-                        EditorView(
-                            allSongs: vm.editorSeedFiles()
-                        )
+                    Button {
+                        isHelpPresented = true
                     } label: {
-                        Label("Editor", systemImage: "timeline.selection")
+                        Label("Help.Info", systemImage: "questionmark.circle")
                     }
-                    .disabled(vm.editorSeedFiles().isEmpty)
+                }
+            }
+            .sheet(isPresented: $isHelpPresented) {
+                NavigationStack {
+                    List {
+                        Text("Import an MP3 from Source File.")
+                        Text("Tap Split Track to process stems.")
+                        Text("Use Save Stems to store files in your Separations folders.")
+                        Text("Open Editor to stage and arrange saved tracks.")
+                    }
+                    .navigationTitle("Usage Tips")
+                    .toolbar {
+                        ToolbarItem(placement: .topBarTrailing) {
+                            Button("Done") {
+                                isHelpPresented = false
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -124,6 +140,7 @@ struct AudioSplitterView: View {
                 EditorView(
                     allSongs: vm.editorSeedFiles()
                 )
+                .colorScheme(.dark)
             } label: {
                 Label("Open Editor", systemImage: "timeline.selection")
                     .frame(maxWidth: .infinity)

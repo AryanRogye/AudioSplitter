@@ -6,11 +6,13 @@
 //
 
 import SwiftUI
+import AudioHelper
 
 enum ComfyTab: String, CaseIterable {
     case home = "Home"
     case audioSplitter = "Audio Splitter"
     case textToSpeech = "Text to Speech"
+    case utils = "Utils"
     case settings = "Settings"
 
     var icon: String {
@@ -21,6 +23,8 @@ enum ComfyTab: String, CaseIterable {
             return "waveform"
         case .textToSpeech:
             return "rectangle.3.offgrid.bubble.left.fill"
+        case .utils:
+            return "wrench"
         case .settings:
             return "gear"
         }
@@ -32,7 +36,8 @@ enum ComfyTab: String, CaseIterable {
         case .settings:         SettingsView()
         case .home:             HomeView()
         case .audioSplitter:    AudioSplitterView()
-        case .textToSpeech:     TextToSpeechView()
+        case .utils        :    UtilsView()
+        case .textToSpeech:     TTSView()
         }
     }
 }
