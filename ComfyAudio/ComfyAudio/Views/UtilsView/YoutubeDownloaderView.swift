@@ -59,7 +59,7 @@ struct YoutubeDownloaderView: View {
                 HStack(alignment: .top, spacing: 8) {
                     Image(systemName: "exclamationmark.triangle.fill")
                         .foregroundStyle(.yellow)
-                    Text("Warning: this screen might crash sometimes, but it should eventually work if you reopen and try again.")
+                    Text("Experimental: YouTube download may fail or behave inconsistently on some videos/devices. If it fails, retry.")
                         .font(.caption2)
                         .foregroundStyle(primaryTextColor)
                         .frame(maxWidth: .infinity, alignment: .leading)

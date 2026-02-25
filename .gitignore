@@ -42,3 +42,7 @@ DerivedData/
 *.ckpt
 *.safetensors
 *.th
+*.venv
+venv/
+.venv/
+ComfyAudio/venv/

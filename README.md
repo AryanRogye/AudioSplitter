@@ -1,11 +1,29 @@
-# AudioSplitter
+# ComfyAudio
 
+This repository hosts an on-device iOS audio ML stack focused on stem separation and local inference.
 
-AudioSplitter is an on-device audio **machine learning system** for iOS focused on **neural stem separation** and **local inference pipelines**.
+`ComfyAudio` is now the primary app target in this repo.
 
-The project explores deploying **UVR/MDX-style source separation networks** fully on device using **Core ML**, including **model conversion (ONNX → CoreML)**, **tensor preprocessing**, **streaming inference**, and **memory-aware audio reconstruction** all running locally on iPhone hardware with **no cloud dependency**.
+## Repository Layout
 
-It serves as both a functional app and a **reference implementation** for shipping **real-world ML audio pipelines** directly on iOS.
+- `ComfyAudio/` primary iOS app project and UI.
+- `AudioHelper/` shared Swift package (stem separation engine, downloader, TTS, file management, packaged model resources).
+- `old/` archived legacy modules and app code.
+  - `old/AudioSplitter/`
+  - `old/AudioUI/`
+  - `old/NO_DOWNLOAD/`
+- `scripts/` tooling (including model conversion).
+
+## Core Upstream Credits
+
+This app relies heavily on the following upstream projects:
+
+- `FluidAudio` by FluidInference:
+  https://github.com/FluidInference/FluidAudio
+  Provides core on-device audio/voice inference capabilities used by the app's `AudioHelper` package.
+- `YoutubeDL-iOS` by kewlbear:
+  https://github.com/kewlbear/YoutubeDL-iOS
+  Powers the in-app YouTube download workflow used in `ComfyAudio` utilities.
 
 ## License
 
@@ -21,21 +39,19 @@ This repository's source code is licensed under LGPL-2.1-or-later.
 - Xcode Command Line Tools (`xcode-select --install`)
 - iOS Simulator runtime supported by your Xcode version
 
-This project currently targets iOS `26.0` in `AudioSplitter.xcodeproj/project.pbxproj`.
+## Quick Start (Primary App)
 
-## Quick Start
-
-1. Open `AudioSplitter.xcodeproj` in Xcode.
-2. Select scheme `AudioSplitter`.
+1. Open `ComfyAudio/ComfyAudio.xcodeproj` in Xcode.
+2. Select scheme `ComfyAudio`.
 3. Select an iOS Simulator device.
 4. Build and run.
 
-Command-line build (verified):
+Command-line build:
 
 ```bash
 xcodebuild \
-  -project AudioSplitter.xcodeproj \
-  -scheme AudioSplitter \
+  -project ComfyAudio/ComfyAudio.xcodeproj \
+  -scheme ComfyAudio \
   -destination 'generic/platform=iOS Simulator' \
   CODE_SIGNING_ALLOWED=NO \
   build
@@ -43,16 +59,17 @@ xcodebuild \
 
 ## Model Setup (UVRMDXNet)
 
-The app expects a Core ML model compatible with the UVR MDX contract.
+The runtime expects a Core ML model compatible with the UVR/MDX contract.
 
-- Expected model names in bundle:
+- Expected model names:
   - `UVRMDXNet`
   - `StemSeparator`
   - `AudioSeparator`
   - `DemucsSeparator`
 - Expected input shape: `[1, 4, 2560, 256]` (multi-array)
 - Expected output shape: `[1, 4, 2560, 256]` (multi-array)
-- Pipeline reference: `UVR-MDX-NET-Inst_HQ_5` contract in `AudioSplitter/StemSeparation/Internal/CoreMLMDXStemSeparatorAdapter.swift`
+- Pipeline reference:
+  - `AudioHelper/Sources/AudioHelper/StemSeperation/Core/CoreMLStemSeparatorEngine.swift`
 
 ### 1. Get model weights
 
@@ -60,21 +77,19 @@ Official UVR model downloads are published from:
 
 - `https://github.com/TRvlvr/model_repo/releases/tag/all_public_uvr_models`
 
-Example source model used for this app's contract:
+Example source model:
 
 - `UVR-MDX-NET-Inst_HQ_5.onnx`
 
 ### 2. Convert to Core ML package
 
-This repo uses a Core ML package (`.mlpackage`) at runtime.
-
-Use the conversion script:
+Install conversion dependencies and convert:
 
 ```bash
 python3 -m pip install -r scripts/requirements-model-conversion.txt
 python3 scripts/convert_model_to_mlpackage.py \
   --source /path/to/UVR-MDX-NET-Inst_HQ_5.onnx \
-  --output AudioSplitter/UVRMDXNet.mlpackage \
+  --output AudioHelper/Sources/AudioHelper/Resources/UVRMDXNet.mlpackage \
   --shape 1,4,2560,256 \
   --input-name input \
   --min-ios iOS17 \
@@ -86,25 +101,13 @@ TorchScript input also works:
 ```bash
 python3 scripts/convert_model_to_mlpackage.py \
   --source /path/to/model.ts \
-  --output AudioSplitter/UVRMDXNet.mlpackage
+  --output AudioHelper/Sources/AudioHelper/Resources/UVRMDXNet.mlpackage
 ```
-
-The script attempts ONNX conversion through `onnx2torch` when source is `.onnx`.
-
-After conversion, ensure you have:
-
-- `UVRMDXNet.mlpackage`
-
-Place it at:
-
-- `AudioSplitter/UVRMDXNet.mlpackage`
 
 ### 3. Validate model metadata
 
-Use:
-
 ```bash
-xcrun coremlcompiler metadata AudioSplitter/UVRMDXNet.mlpackage
+xcrun coremlcompiler metadata AudioHelper/Sources/AudioHelper/Resources/UVRMDXNet.mlpackage
 ```
 
 Confirm:
@@ -114,11 +117,7 @@ Confirm:
 
 ### 4. Build
 
-When present, Xcode will compile the model into `.mlmodelc` during build.
-
-If the model is missing or incompatible, the app reports errors from:
-
-- `AudioSplitter/StemSeparation/StemSeparationAPI.swift`
+Xcode compiles model resources during build. If the model is missing or incompatible, the stem separation layer reports runtime errors.
 
 ## Important Notes on Repository Hygiene
 
@@ -136,7 +135,7 @@ If the model is missing or incompatible, the app reports errors from:
 
 ## FFmpeg / LGPL Compliance Notes
 
-This app currently depends on FFmpeg packages distributed under LGPL-2.1+.
+This app depends on FFmpeg packages distributed under LGPL-2.1+:
 
 - `FFmpeg-iOS-Lame`
 - `FFmpeg-iOS-Support`
@@ -153,23 +152,8 @@ See `THIRD_PARTY_NOTICES.md` for package versions and source links.
 ## Troubleshooting
 
 - `No bundled Core ML model was found`:
-  - Ensure `UVRMDXNet.mlpackage` exists under `AudioSplitter/`.
+  - Ensure `UVRMDXNet.mlpackage` exists under `AudioHelper/Sources/AudioHelper/Resources/`.
   - Rebuild clean (`Product > Clean Build Folder`).
 - `Unsupported model input/output`:
-  - Verify the model input/output shapes are `[1, 4, 2560, 256]`.
+  - Verify model input/output shapes are `[1, 4, 2560, 256]`.
   - Verify model uses multi-array IO.
-
-## Audio Splitter Lab (Debug Only)
-
-The **Audio Splitter Lab** is a debug-only workspace for trying UI ideas without cluttering the main product flow.
-
-- Purpose: prototype and compare loading animations, interaction patterns, and visual styles.
-- Scope: experiments should live in the lab screens first, then be promoted to production UI only after validation.
-- Rule: keep the main `Audio Splitter` screen stable and focused; do not ship unfinished experiments there.
-
-Current lab entry point:
-
-- Open the `Labs` button in the top-right toolbar.
-- Use `Loading Lab` to test and select loading styles.
-- Use `Library + Stage Styles` to swipe through five UI concept tabs for workflow experiments.
-- Add future UI experiments as additional lab modules under the same hub.

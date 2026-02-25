@@ -1,6 +1,6 @@
 //
 //  BeatGridView.swift
-//  AudioSplitter
+//  ComfyAudio
 //
 
 import SwiftUI

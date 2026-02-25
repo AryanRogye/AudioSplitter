@@ -1,6 +1,6 @@
 //
 //  BeatScale.swift
-//  AudioSplitter
+//  ComfyAudio
 //
 
 import SwiftUI

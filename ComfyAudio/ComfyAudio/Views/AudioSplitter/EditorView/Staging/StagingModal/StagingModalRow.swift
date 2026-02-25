@@ -1,6 +1,6 @@
 //
 //  StagingModalRow.swift
-//  AudioSplitter
+//  ComfyAudio
 //
 //  Created by Aryan Rogye on 2/10/26.
 //

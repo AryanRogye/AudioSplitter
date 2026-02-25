@@ -1,6 +1,6 @@
 //
 //  TimelineEditorView.swift
-//  AudioSplitter
+//  ComfyAudio
 //
 //  Created by Aryan Rogye on 2/12/26.
 //

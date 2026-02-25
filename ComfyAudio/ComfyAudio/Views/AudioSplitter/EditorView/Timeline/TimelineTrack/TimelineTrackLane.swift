@@ -1,6 +1,6 @@
 //
 //  TimelineTrackLane.swift
-//  AudioSplitter
+//  ComfyAudio
 //
 
 import SwiftUI

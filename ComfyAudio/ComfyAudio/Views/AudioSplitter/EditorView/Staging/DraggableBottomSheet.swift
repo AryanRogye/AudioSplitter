@@ -1,6 +1,6 @@
 //
 //  DraggableBottomSheet.swift
-//  AudioSplitter
+//  ComfyAudio
 //
 //  Created by Aryan Rogye on 2/9/26.
 //

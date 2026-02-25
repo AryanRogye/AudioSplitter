@@ -1,6 +1,6 @@
 //
 //  TimelineContent.swift
-//  AudioSplitter
+//  ComfyAudio
 //
 
 import SwiftUI

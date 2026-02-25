@@ -1,6 +1,6 @@
 //
 //  WaveformShape.swift
-//  AudioSplitter
+//  ComfyAudio
 //
 
 import SwiftUI
