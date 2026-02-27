@@ -31,7 +31,7 @@ let package = Package(
         .package(
             url: "https://github.com/kewlbear/Python-iOS.git",
             from: "0.1.1-b"
-        )
+        ),
     ],
     targets: [
         // Targets are the basic building blocks of a package, defining a module or a test suite.
