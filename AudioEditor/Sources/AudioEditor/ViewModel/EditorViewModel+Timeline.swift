@@ -52,4 +52,16 @@ extension EditorViewModel {
         }
         timelineSong.remove(clip)
     }
+    
+    public func duplicate(_ clip: TimelineClip?) {
+        guard let clip else {
+            print("Clip is Nil")
+            return
+        }
+        if selectedClip == clip.id {
+            selectedClip = nil
+        }
+        let newClip = TimelineClip(from: clip)
+        timelineSong.assign(newClip)
+    }
 }

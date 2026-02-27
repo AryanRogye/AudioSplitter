@@ -34,6 +34,15 @@ class TimelineClip: Identifiable, @MainActor Equatable, Sendable {
     /// now means CLIP duration
     var duration: TimeInterval = 0
     
+    init(from clip: TimelineClip) {
+        self.asset = clip.asset
+        self.startTime = clip.startTime
+        self.volume = clip.volume
+        self.sourceStart = clip.sourceStart
+        self.duration = clip.duration
+        observeVolume()
+    }
+    
     init(asset: EditorFile) async {
         self.asset = asset
         await calcDuration()

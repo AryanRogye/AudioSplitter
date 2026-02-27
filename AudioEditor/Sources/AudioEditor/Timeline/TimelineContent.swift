@@ -72,6 +72,7 @@ struct TimelineContent: View {
 
 struct ClipsView: View {
     
+    @Environment(EditorTheme.self) var theme
     @Bindable var editorVM: EditorViewModel
     let scale: BeatScale
     let totalWidth: CGFloat
@@ -113,6 +114,41 @@ struct ClipsView: View {
                 } label: {
                     Label("Remove Stem", systemImage: "trash")
                 }
+            } preview: {
+                VStack(alignment: .leading, spacing: 6) {
+                    // Title
+                    Text(clip.asset.displayName)
+                        .font(.system(size: 11, weight: .semibold, design: .rounded))
+                        .lineLimit(1)
+                        .truncationMode(.tail)
+                        .foregroundStyle(theme.accent.opacity(0.9))
+                    
+                    // Start time chip
+                    HStack(spacing: 4) {
+                        Image(systemName: "clock.arrow.circlepath")
+                            .font(.system(size: 9, weight: .semibold))
+                        Text("\(clip.startTime, specifier: "%.2f")s")
+                            .font(.system(size: 10, design: .monospaced))
+                    }
+                    .foregroundStyle(theme.accent.opacity(0.8))
+                    .padding(.horizontal, 6)
+                    
+                    // Duration chip
+                    HStack(spacing: 4) {
+                        Image(systemName: "hourglass")
+                            .font(.system(size: 9, weight: .semibold))
+                        Text("\(clip.duration, specifier: "%.2f")s")
+                            .font(.system(size: 10, design: .monospaced))
+                    }
+                    .foregroundStyle(theme.accent.opacity(0.8))
+                    .padding(.horizontal, 6)
+                }
+                .font(.system(size: 11, weight: .bold, design: .rounded))
+                .minimumScaleFactor(0.5)
+                .lineLimit(1)
+                .frame(width: headerWidth, alignment: .leading)
+                .padding()
+                .glassEffect(.regular.tint(.black).interactive(), in: RoundedRectangle(cornerRadius: 12))
             }
         }
     }

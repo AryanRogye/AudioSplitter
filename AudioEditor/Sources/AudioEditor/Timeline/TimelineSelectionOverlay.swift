@@ -58,54 +58,70 @@ struct TimelineSelectionOverlay: View {
     private var timelineActions: some View {
         ScrollView(.horizontal, showsIndicators: false) {
             HStack(spacing: 12) {
-                // Split button
-                Button {
-                    Task { try? await editorVM.splitAtCurrentSelection() }
-                } label: {
-                    Image(systemName: "scissors")
-                        .font(.system(size: 16, weight: .medium))
-                        .frame(width: 36, height: 36)
-                        .background(
-                            Capsule().fill(theme.accent.opacity(0.15))
-                        )
-                }
-                .buttonStyle(.plain)
-                .contentShape(Capsule())
-
-                // Mute/solo button (placeholder action)
-                Button {
-                    withAnimation(.spring()) {
-                        clickedVolume.toggle()
-                    }
-                } label: {
-                    Image(systemName: "speaker.2")
-                        .font(.system(size: 16, weight: .medium))
-                        .frame(width: 36, height: 36)
-                        .background(
-                            Capsule().fill(theme.accent.opacity(0.15))
-                        )
-                }
-                .buttonStyle(.plain)
-                .contentShape(Capsule())
+                /// Split button
+                splitButton
                 
-                Button {
-                    withAnimation {
-                        
-                    }
-                } label: {
-                    Image(systemName: "plus.square.on.square")
-                        .font(.system(size: 16, weight: .medium))
-                        .frame(width: 36, height: 36)
-                        .background(
-                            Capsule().fill(theme.accent.opacity(0.15))
-                        )
-                }
-                .buttonStyle(.plain)
-                .contentShape(Capsule())
+                /// Mute/solo button (placeholder action)
+                volumeButton
                 
+                
+                /// Duplicate
+                duplicateButton
             }
             .foregroundStyle(theme.accent)
         }
+    }
+    
+    // MARK: - Split Button
+    private var splitButton: some View {
+        Button {
+            Task { try? await editorVM.splitAtCurrentSelection() }
+        } label: {
+            Image(systemName: "scissors")
+                .font(.system(size: 16, weight: .medium))
+                .frame(width: 36, height: 36)
+                .background(
+                    Capsule().fill(theme.accent.opacity(0.15))
+                )
+        }
+        .buttonStyle(.plain)
+        .contentShape(Capsule())
+    }
+    
+    // MARK: - Volume Button
+    private var volumeButton: some View {
+        Button {
+            withAnimation(.spring()) {
+                clickedVolume.toggle()
+            }
+        } label: {
+            Image(systemName: "speaker.2")
+                .font(.system(size: 16, weight: .medium))
+                .frame(width: 36, height: 36)
+                .background(
+                    Capsule().fill(theme.accent.opacity(0.15))
+                )
+        }
+        .buttonStyle(.plain)
+        .contentShape(Capsule())
+    }
+    
+    // MARK: - Duplicate Button
+    private var duplicateButton: some View {
+        Button {
+            withAnimation(.spring()) {
+                editorVM.duplicate(editorVM.selectedClipFile())
+            }
+        } label: {
+            Image(systemName: "plus.square.on.square")
+                .font(.system(size: 16, weight: .medium))
+                .frame(width: 36, height: 36)
+                .background(
+                    Capsule().fill(theme.accent.opacity(0.15))
+                )
+        }
+        .buttonStyle(.plain)
+        .contentShape(Capsule())
     }
 }
 
