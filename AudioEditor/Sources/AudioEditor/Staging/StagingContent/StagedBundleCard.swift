@@ -57,10 +57,11 @@ struct StagedBundleCard: View {
 }
 
 
+#if DEBUG
 #Preview {
     StagedBundleCard(item: .previewSong, onRemove: {}, onAddToTimeline: {})
     StagedBundleCard(item: .previewSong, onRemove: {}, onAddToTimeline: {})
     StagedBundleCard(item: .previewSong, onRemove: {}, onAddToTimeline: {})
     StagedBundleCard(item: .previewSong, onRemove: {}, onAddToTimeline: {})
 }
-
+#endif
