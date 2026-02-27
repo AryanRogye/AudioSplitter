@@ -15,6 +15,12 @@ extension EditorViewModel {
     }
     /// Removing Items from staging
     public func removeFromStaged(_ item: EditorFile) {
-        self.stagedTracks.removeAll(where: { $0.id == item.id })
+        /// this way we only remove 1 item
+        for i in 0..<self.stagedTracks.count {
+            if self.stagedTracks[i].id == item.id {
+                self.stagedTracks.remove(at: i)
+                return
+            }
+        }
     }
 }

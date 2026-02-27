@@ -30,7 +30,6 @@ struct StagingArea: View {
 
     var body: some View {
         ZStack(alignment: .bottom) {
-            
             /// Real Content
             CurrentStagingContent(
                 editorVM: editorVM

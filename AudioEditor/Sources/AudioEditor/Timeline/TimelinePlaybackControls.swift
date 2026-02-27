@@ -6,6 +6,8 @@
 import SwiftUI
 
 struct TimelinePlaybackControls: View {
+    
+    @Environment(EditorTheme.self) var theme
     let isPlaying: Bool
     let onToggle: () -> Void
 
@@ -13,11 +15,18 @@ struct TimelinePlaybackControls: View {
         HStack {
             Spacer()
             Button(action: onToggle) {
-                Image(systemName: isPlaying ? "stop.fill" : "play.fill")
+                Image(systemName: isPlaying ? "pause.fill" : "play.fill")
+                    .foregroundStyle(theme.accent)
+                    .imageScale(.medium)
+                    .padding(8)
+                    .background(
+                        Circle().stroke(theme.accent.opacity(0.35), lineWidth: 1)
+                    )
             }
+            .buttonStyle(.plain)
+            .padding(.vertical, 6)
+            
             Spacer()
         }
-        .buttonStyle(PlayButtonStyle())
-        .padding(.vertical, 6)
     }
 }

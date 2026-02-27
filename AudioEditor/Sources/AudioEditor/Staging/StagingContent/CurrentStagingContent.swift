@@ -10,6 +10,7 @@ import SwiftUI
 /// Currently Staged Content, this is the top 30% of the screen in the EditorView
 struct CurrentStagingContent: View {
     @Bindable var editorVM: EditorViewModel
+    @Environment(EditorTheme.self) var theme: EditorTheme
     
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
@@ -17,12 +18,14 @@ struct CurrentStagingContent: View {
             HStack {
                 Text("Staged Tracks")
                     .font(.system(.headline, design: .rounded))
+                    .foregroundStyle(theme.textPrimary)
                 
                 Text("\(editorVM.stagedTracks.count)")
                     .font(.caption2.bold())
                     .padding(.horizontal, 6)
                     .padding(.vertical, 2)
-                    .background(.secondary.opacity(0.2), in: Capsule())
+                    .foregroundStyle(theme.accent)
+                    .background(theme.textSecondary.opacity(0.2), in: Capsule())
             }
             .padding(.horizontal)
             .padding(.top, 12)
@@ -32,6 +35,7 @@ struct CurrentStagingContent: View {
                                        systemImage: "music.note.list",
                                        description: Text("Select tracks from your library to start editing."))
                 .symbolVariant(.slash)
+                .foregroundStyle(theme.accent.opacity(0.5))
             } else {
                 /// List of all staged songs
                 ScrollView {
@@ -60,6 +64,6 @@ struct CurrentStagingContent: View {
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(Color(.systemGray6))
+        .background(theme.backgroundSecondary)
     }
 }

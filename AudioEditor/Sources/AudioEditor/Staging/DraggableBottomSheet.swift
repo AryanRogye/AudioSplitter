@@ -8,6 +8,9 @@
 import SwiftUI
 
 struct DraggableBottomSheet<Content: View>: View {
+    
+    @Environment(EditorTheme.self) var theme
+    
     @Binding var isOpen: Bool
     var areaHeight: CGFloat
     var title: String
@@ -64,9 +67,10 @@ struct DraggableBottomSheet<Content: View>: View {
         }
         .frame(maxWidth: .infinity)
         .frame(height: max(0, areaHeight))
-        .background(.ultraThinMaterial, in: shape)
+        .background(.ultraThinMaterial.opacity(0.1), in: RoundedRectangle(cornerRadius: 12))
+        .glassEffect(.regular, in: RoundedRectangle(cornerRadius: 12))
         .overlay(
-            shape.stroke(.white.opacity(0.12))
+            shape.stroke(theme.accent.opacity(0.12))
         )
         .shadow(radius: isOpen ? 0 : 20)
         .offset(y: sheetOffset)

@@ -62,6 +62,29 @@ final class EditorViewModel {
 }
 
 extension EditorViewModel {
+    private static func resample(_ values: [Float], to targetCount: Int) -> [Float] {
+        guard targetCount > 0 else { return [] }
+        guard !values.isEmpty else { return [] }
+        guard values.count != targetCount else { return values }
+        guard values.count > 1 else { return Array(repeating: values[0], count: targetCount) }
+        
+        let maxSourceIndex = values.count - 1
+        let maxTargetIndex = max(targetCount - 1, 1)
+        var output: [Float] = []
+        output.reserveCapacity(targetCount)
+        
+        for targetIndex in 0..<targetCount {
+            let position = Double(targetIndex) * Double(maxSourceIndex) / Double(maxTargetIndex)
+            let lower = Int(position.rounded(.down))
+            let upper = min(lower + 1, maxSourceIndex)
+            let fraction = Float(position - Double(lower))
+            let interpolated = values[lower] + (values[upper] - values[lower]) * fraction
+            output.append(interpolated)
+        }
+        
+        return output
+    }
+
     static func generateWaveform(
         from url: URL,
         startTime: TimeInterval = 0,
@@ -132,9 +155,10 @@ extension EditorViewModel {
         
         // 4. Normalize the data so the absolute loudest peak in the whole file equals 1.0
         if let maxVal = waveform.max(), maxVal > 0 {
-            return waveform.map { $0 / maxVal }
+            let normalized = waveform.map { $0 / maxVal }
+            return resample(normalized, to: sampleCount)
         }
         
-        return waveform
+        return resample(waveform, to: sampleCount)
     }
 }

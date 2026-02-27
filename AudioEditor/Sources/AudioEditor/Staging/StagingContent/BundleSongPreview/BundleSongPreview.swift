@@ -14,6 +14,7 @@ import AudioPlayback
 /// Player for each song in the staging area
 struct BundleSongPreview: View {
     
+    @Environment(EditorTheme.self) var theme
     let url: URL
     var onRemove: (() -> Void)? = nil
     var onAddToTimeline: (() -> Void)? = nil
@@ -24,36 +25,38 @@ struct BundleSongPreview: View {
     var body: some View {
         VStack {
             iOSAudioSlider(vm: vm)
+            
             HStack {
                 Button {
                     vm.playAudio(url)
                 } label: {
                     Image(systemName: vm.preview.isPlaying ? "pause.fill" : "play.fill")
+                        .foregroundStyle(theme.accent)
                         .imageScale(.medium)
                         .padding(8)
                         .background(
-                            Circle().stroke(Color.secondary.opacity(0.35), lineWidth: 1)
+                            Circle().stroke(theme.accent.opacity(0.35), lineWidth: 1)
                         )
                 }
                 .buttonStyle(.plain)
-                .foregroundStyle(.primary)
                 .accessibilityLabel("Play preview")
 
-                
                 Button(
                     action: { onAddToTimeline?() }
                 ) {
                     HStack(spacing: 6) {
                         Image(systemName: "plus.circle")
+                            .foregroundStyle(theme.accent)
                             .imageScale(.medium)
                         Text("Add To Timeline")
+                            .foregroundStyle(theme.accent)
                             .font(.subheadline)
                     }
                     .padding(.horizontal, 10)
                     .padding(.vertical, 6)
                     .background(
                         Capsule(style: .circular)
-                            .stroke(Color.secondary.opacity(0.35), lineWidth: 1)
+                            .stroke(theme.accent.opacity(0.35), lineWidth: 1)
                     )
                 }
                 .buttonStyle(.plain)
@@ -65,12 +68,12 @@ struct BundleSongPreview: View {
                 if let onRemove {
                     Button(action: onRemove) {
                         Image(systemName: "xmark.circle.fill")
-                            .foregroundStyle(.secondary.opacity(0.65))
+                            .foregroundStyle(theme.textSecondary.opacity(0.55))
                             .imageScale(.large)
                             .padding(6)
                             .background(
                                 Circle()
-                                    .fill(.thinMaterial)
+                                    .fill(theme.accent.opacity(0.3))
                             )
                     }
                     .buttonStyle(.plain)

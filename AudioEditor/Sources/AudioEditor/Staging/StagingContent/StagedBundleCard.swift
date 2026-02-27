@@ -10,6 +10,7 @@ import SwiftUI
 /// Represents each staged card in the CurrentStagingContent
 struct StagedBundleCard: View {
     
+    @Environment(EditorTheme.self) var theme
     let item: EditorFile
     var onRemove: () -> Void
     var onAddToTimeline: () -> Void
@@ -22,10 +23,12 @@ struct StagedBundleCard: View {
                 VStack(alignment: .leading, spacing: 2) {
                     Text(item.displayName)
                         .font(.system(size: 18, weight: .semibold, design: .rounded))
+                        .foregroundStyle(theme.accent)
                         .lineLimit(1)
                     
                     Text(item.createdAt.formatted(.dateTime.month().day().year()))
                         .font(.caption2)
+                        .foregroundStyle(theme.accent.opacity(0.7))
                         .foregroundStyle(.secondary)
                 }
                 
@@ -43,10 +46,10 @@ struct StagedBundleCard: View {
         .padding()
         .background(
             RoundedRectangle(cornerRadius: 12, style: .continuous)
-                .fill(Color(.secondarySystemBackground))
+                .fill(theme.backgroundSecondary)
                 .overlay(
                     RoundedRectangle(cornerRadius: 12, style: .continuous)
-                        .strokeBorder(Color.black.opacity(0.05), lineWidth: 0.5)
+                        .strokeBorder(theme.accent.opacity(0.4), lineWidth: 0.5)
                 )
         )
         .shadow(color: .black.opacity(0.04), radius: 6, x: 0, y: 2)

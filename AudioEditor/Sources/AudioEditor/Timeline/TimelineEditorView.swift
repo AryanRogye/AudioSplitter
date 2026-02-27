@@ -9,6 +9,7 @@ import SwiftUI
 
 struct TimelineEditorView: View {
 
+    @Environment(EditorTheme.self) var theme
     @Bindable var editorVM: EditorViewModel
 
     let pixelsPerSecond: CGFloat = 20
@@ -30,7 +31,10 @@ struct TimelineEditorView: View {
                 editorVM.toggleAudio()
             }
 
-            Divider()
+            Rectangle()
+                .frame(maxWidth: .infinity)
+                .frame(height: 1)
+                .foregroundStyle(theme.accent.opacity(0.5))
 
             ScrollView(.horizontal, showsIndicators: false) {
                 ZStack(alignment: .topLeading) {
@@ -52,7 +56,7 @@ struct TimelineEditorView: View {
             .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(Color(.systemGray6))
+        .background(theme.backgroundPrimary)
         .dropDestination(for: EditorFile.self) { items, _ in
             withAnimation(.spring()) {
                 editorVM.addDroppedItems(items)

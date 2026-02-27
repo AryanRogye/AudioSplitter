@@ -20,8 +20,8 @@ struct TimelineContent: View {
         let totalWidth = CGFloat(totalSeconds) * pixelsPerSecond
 
         return ZStack(alignment: .topLeading) {
-            ScrollView(.horizontal, showsIndicators: false) {
-                VStack(alignment: .leading, spacing: 12) {
+            ScrollView([.vertical], showsIndicators: false) {
+                LazyVStack(alignment: .leading, spacing: 12) {
                     ForEach(editorVM.timelineSong.clips) { clip in
                         Button(action: {
                             if editorVM.selectedClip == clip.id {
@@ -34,7 +34,6 @@ struct TimelineContent: View {
                                 BeatGridView(scale: scale, totalSeconds: totalSeconds, laneHeight: gridHeight)
                                     .padding(.leading, timelineLeftInset)
                                     .frame(width: totalWidth + timelineLeftInset)
-                                    .background(Color(.tertiarySystemBackground))
                                 
                                 TimelineTrackLane(clip: clip, headerWidth: headerWidth, pixelsPerSecond: pixelsPerSecond, selected: Binding(
                                     get: { editorVM.selectedClip == clip.id },
@@ -54,8 +53,10 @@ struct TimelineContent: View {
                         }
                     }
                 }
+                .scrollTargetLayout()
                 .padding(.vertical, 20)
             }
+            .scrollTargetBehavior(.viewAligned)
         }
         .clipped()
     }
