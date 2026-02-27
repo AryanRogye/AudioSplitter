@@ -27,6 +27,7 @@ struct HomeView: View {
                     VStack(spacing: 14) {
                         titleCard
                         splitStatusCard
+                        openSourceCard
                     }
                     .padding(.horizontal)
                     .padding(.top)
@@ -96,6 +97,42 @@ struct HomeView: View {
                     .font(.system(size: 13, weight: .regular, design: .rounded))
                     .foregroundStyle(.white.opacity(0.8))
                     .frame(maxWidth: .infinity, alignment: .leading)
+            }
+        }
+    }
+
+    private var openSourceCard: some View {
+        ComfyAudioCard {
+            Label("Open Source", systemImage: "shippingbox")
+                .font(.system(size: 18, weight: .bold, design: .rounded))
+                .foregroundStyle(.white)
+                .frame(maxWidth: .infinity, alignment: .leading)
+
+            Text("ComfyAudio is open source.")
+                .font(.system(size: 14, weight: .regular, design: .rounded))
+                .foregroundStyle(.white.opacity(0.85))
+                .frame(maxWidth: .infinity, alignment: .leading)
+
+            VStack(spacing: 10) {
+                Link(destination: URL(string: "https://github.com/AryanRogye/AudioSplitter")!) {
+                    Label("View GitHub Repository", systemImage: "link")
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .padding(.vertical, 12)
+                        .padding(.horizontal, 14)
+                        .background((Theme.surface ?? .white).opacity(0.25))
+                        .clipShape(RoundedRectangle(cornerRadius: 12))
+                }
+                .foregroundStyle(.white)
+
+                Link(destination: URL(string: "https://github.com/AryanRogye/AudioSplitter/blob/main/LICENSE")!) {
+                    Label("View License (LGPL-2.1-or-later)", systemImage: "doc.text")
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .padding(.vertical, 12)
+                        .padding(.horizontal, 14)
+                        .background((Theme.surface ?? .white).opacity(0.25))
+                        .clipShape(RoundedRectangle(cornerRadius: 12))
+                }
+                .foregroundStyle(.white)
             }
         }
     }

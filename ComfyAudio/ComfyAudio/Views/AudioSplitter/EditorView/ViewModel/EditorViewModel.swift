@@ -13,8 +13,6 @@ import Accelerate
 @MainActor
 final class EditorViewModel {
     var isRecentsOpen = false
-//    var historyStore: AudioHistoryStoring
-    
     var allSongs: [EditorFile]
     var stagedTracks: [EditorFile] = []
     
@@ -22,19 +20,77 @@ final class EditorViewModel {
     var playbackError: String?
     var shouldShowError = false
     
+    var selectedClip: TimelineClip.ID?
+    
     /// Initializer
-    init(allSongs: [EditorFile]/*, history: any AudioHistoryStoring*/) {
+    init(allSongs: [EditorFile]) {
         self.allSongs = allSongs
-//        self.historyStore = history
+    }
+    
+    public func splitAtCurrentSelection() async throws {
+        guard let selectedClip else { return }
+        try timelineSong.pause()
+        guard let clip = timelineSong.getClip(byID: selectedClip) else {
+            try timelineSong.play()
+            return
+        }
+        
+        let t = timelineSong.currentTime
+        let old_start = clip.startTime
+        let oldSourceStart = clip.sourceStart
+        let old_duration = clip.duration
+        
+        let leftDuration = t - old_start
+        guard leftDuration > 0, leftDuration < clip.duration else {
+            try timelineSong.play()
+            return
+        }
+        /// left peice is set
+        clip.duration = leftDuration
+        
+        /// creating right peice
+        let right = await TimelineClip(asset: clip.asset)
+        right.startTime = t
+        right.sourceStart = oldSourceStart + leftDuration
+        right.duration = old_duration - leftDuration
+        
+        timelineSong.assign(right)
+        
+        print("Stopped At: \(timelineSong.currentTime)")
+        print("End: \(clip.duration)")
     }
 }
 
 extension EditorViewModel {
-    static func generateWaveform(from url: URL, sampleCount: Int = 500) async -> [Float] {
+    static func generateWaveform(
+        from url: URL,
+        startTime: TimeInterval = 0,
+        endTime: TimeInterval? = nil,
+        sampleCount: Int = 500
+    ) async -> [Float] {
         guard let audioFile = try? AVAudioFile(forReading: url) else { return [] }
+        guard sampleCount > 0 else { return [] }
         
-        let frameCount = AVAudioFramePosition(audioFile.length)
-        let framesPerBuffer = AVAudioFrameCount(max(1, frameCount / Int64(sampleCount)))
+        let totalFrames = AVAudioFramePosition(audioFile.length)
+        let sampleRate = audioFile.processingFormat.sampleRate
+        
+        let requestedStartFrame = AVAudioFramePosition(max(0, startTime) * sampleRate)
+        let requestedEndFrame: AVAudioFramePosition = {
+            if let endTime {
+                return AVAudioFramePosition(max(0, endTime) * sampleRate)
+            }
+            return totalFrames
+        }()
+        
+        let startFrame = min(max(0, requestedStartFrame), totalFrames)
+        let endFrame = min(max(startFrame, requestedEndFrame), totalFrames)
+        guard endFrame > startFrame else { return [] }
+        
+        audioFile.framePosition = startFrame
+        
+        let targetFrameCount = endFrame - startFrame
+        let rawFramesPerBuffer = max(1, targetFrameCount / Int64(sampleCount))
+        let framesPerBuffer = AVAudioFrameCount(min(rawFramesPerBuffer, Int64(UInt32.max)))
         
         // 1. Create a buffer sized perfectly for one "chunk" (bin) of our waveform
         guard let buffer = AVAudioPCMBuffer(pcmFormat: audioFile.processingFormat, frameCapacity: framesPerBuffer) else { return [] }
@@ -45,9 +101,10 @@ extension EditorViewModel {
         
         do {
             // 2. Read the audio file sequentially chunk-by-chunk
-            while audioFile.framePosition < frameCount {
-                let framesLeft = frameCount - audioFile.framePosition
-                let framesToRead = min(AVAudioFrameCount(framesLeft), framesPerBuffer)
+            while audioFile.framePosition < endFrame {
+                let framesLeft = endFrame - audioFile.framePosition
+                let clampedFramesLeft = min(framesLeft, AVAudioFramePosition(UInt32.max))
+                let framesToRead = min(AVAudioFrameCount(clampedFramesLeft), framesPerBuffer)
                 
                 try audioFile.read(into: buffer, frameCount: framesToRead)
                 guard let floatChannelData = buffer.floatChannelData, buffer.frameLength > 0 else { break }

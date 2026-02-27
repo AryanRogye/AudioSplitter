@@ -13,7 +13,8 @@ struct TimelineEditorView: View {
 
     let pixelsPerSecond: CGFloat = 20
 
-    private let headerWidth: CGFloat = 80
+    /// left section
+    private let headerWidth: CGFloat = 90
     private let headerSpacing: CGFloat = 10
     private let laneHPadding: CGFloat = 8
 
@@ -36,7 +37,8 @@ struct TimelineEditorView: View {
                     TimelineContent(
                         editorVM: editorVM,
                         pixelsPerSecond: pixelsPerSecond,
-                        timelineLeftInset: timelineLeftInset
+                        timelineLeftInset: timelineLeftInset,
+                        headerWidth: headerWidth
                     )
 
                     TimelinePlayhead(
@@ -56,6 +58,25 @@ struct TimelineEditorView: View {
                 editorVM.addDroppedItems(items)
             }
             return true
+        }
+        /// TODO: SHOW SOMETHING HERE ON SELECTED ID
+        .overlay(alignment: .bottom) {
+            if let id = editorVM.selectedClip {
+                GlassEffectContainer {
+                    VStack {
+                        Text("Selected: \(id)")
+                        Button {
+                            Task {
+                                try? await editorVM.splitAtCurrentSelection()
+                            }
+                        } label: {
+                            Text("Split At Current?")
+                        }
+                        .buttonStyle(GlassProminentButtonStyle())
+                    }
+                    .padding(4)
+                }
+            }
         }
     }
 }

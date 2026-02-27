@@ -21,7 +21,7 @@ public enum SongType: String, Codable {
 }
 
 /// This helps us translate whatever spagetti the ml had us doing to something clean the UI can use
-public struct EditorFile: Identifiable, Codable, Hashable, Transferable {
+public struct EditorFile: Identifiable, Codable, Hashable, Transferable, Equatable {
     
     public let id: UUID
     let displayName: String

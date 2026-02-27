@@ -8,38 +8,84 @@ import SwiftUI
 struct TimelineTrackLane: View {
     @Bindable var clip: TimelineClip
     let pixelsPerSecond: CGFloat
+    let headerWidth: CGFloat
 
     @State private var initialStartTime: TimeInterval? = nil
     @State private var waveformSamples: [Float] = []
-    @State private var length: CGFloat
+    @Binding private var selected: Bool
 
-    init(clip: TimelineClip, pixelsPerSecond: CGFloat) {
+    init(clip: TimelineClip, headerWidth: CGFloat, pixelsPerSecond: CGFloat, selected: Binding<Bool>) {
         self.clip = clip
+        self.headerWidth = headerWidth
         self.pixelsPerSecond = pixelsPerSecond
-        self.length = max(clip.duration, 0.2) * pixelsPerSecond
+        self._selected = selected
+    }
+    
+    private var laneWidth: CGFloat {
+        max(clip.duration, 0.2) * pixelsPerSecond
+    }
+    
+    var color: LinearGradient {
+        if selected {
+            return LinearGradient(
+                colors: [Color.red.opacity(0.1), Color.red.opacity(0.3)],
+                startPoint: .top,
+                endPoint: .bottom
+            )
+        } else {
+            return LinearGradient(
+                colors: [Color.blue.opacity(0.6), Color.blue.opacity(0.8)],
+                startPoint: .top,
+                endPoint: .bottom
+            )
+        }
     }
 
     var body: some View {
         HStack(spacing: 0) {
-
             VStack(alignment: .leading, spacing: 6) {
+                // Title
                 Text(clip.asset.displayName)
-                    .font(.system(size: 11, weight: .bold, design: .rounded))
+                    .font(.system(size: 11, weight: .semibold, design: .rounded))
                     .lineLimit(1)
-
-                HStack(spacing: 6) {
-                    Text("M")
-                        .font(.system(size: 8, weight: .bold))
-                        .frame(width: 18, height: 18)
-                        .background(Color.gray.opacity(0.2), in: RoundedRectangle(cornerRadius: 3))
-
-                    Text("S")
-                        .font(.system(size: 8, weight: .bold))
-                        .frame(width: 18, height: 18)
-                        .background(Color.gray.opacity(0.2), in: RoundedRectangle(cornerRadius: 3))
+                    .truncationMode(.tail)
+                
+                // Start time chip
+                HStack(spacing: 4) {
+                    Image(systemName: "clock.arrow.circlepath")
+                        .font(.system(size: 9, weight: .semibold))
+                    Text("\(clip.startTime, specifier: "%.2f")s")
+                        .font(.system(size: 10, design: .monospaced))
                 }
+                .padding(.horizontal, 6)
+                .padding(.vertical, 3)
+                .background(Color.white.opacity(0.06))
+                .overlay(
+                    Capsule().stroke(Color.white.opacity(0.15), lineWidth: 1)
+                )
+                .clipShape(Capsule())
+                .fixedSize()
+                
+                // Duration chip
+                HStack(spacing: 4) {
+                    Image(systemName: "hourglass")
+                        .font(.system(size: 9, weight: .semibold))
+                    Text("\(clip.duration, specifier: "%.2f")s")
+                        .font(.system(size: 10, design: .monospaced))
+                }
+                .padding(.horizontal, 6)
+                .padding(.vertical, 3)
+                .background(Color.white.opacity(0.06))
+                .overlay(
+                    Capsule().stroke(Color.white.opacity(0.15), lineWidth: 1)
+                )
+                .clipShape(Capsule())
+                .fixedSize()
             }
-            .frame(width: 80, alignment: .leading)
+            .font(.system(size: 11, weight: .bold, design: .rounded))
+            .minimumScaleFactor(0.5)
+            .lineLimit(1)
+            .frame(width: headerWidth, alignment: .leading)
             .padding(.horizontal, 8)
             .background(Color(.systemGray6))
 
@@ -51,14 +97,8 @@ struct TimelineTrackLane: View {
 
                 ZStack {
                     RoundedRectangle(cornerRadius: 4)
-                        .fill(
-                            LinearGradient(
-                                colors: [Color.blue.opacity(0.6), Color.blue.opacity(0.8)],
-                                startPoint: .top,
-                                endPoint: .bottom
-                            )
-                        )
-
+                        .fill(color)
+                    
                     WaveformShape(samples: waveformSamples)
                         .stroke(Color.white.opacity(0.7), lineWidth: 1)
                         .padding(.vertical, 4)
@@ -70,7 +110,7 @@ struct TimelineTrackLane: View {
                         .fill(Color.white.opacity(0.2))
                         .frame(height: 1)
                 }
-                .frame(width: length, height: 48)
+                .frame(width: laneWidth, height: 48)
                 .overlay(alignment: .topLeading) {
                     HStack(spacing: 4) {
                         Image(systemName: "waveform")
@@ -106,12 +146,16 @@ struct TimelineTrackLane: View {
         .overlay(alignment: .bottom) {
             Divider()
         }
-        .task {
+        .task(id: "\(clip.asset.url.absoluteString)|\(clip.sourceStart)|\(clip.duration)") {
             // 1. Request access to the file outside your sandbox
             let isSecured = clip.asset.url.startAccessingSecurityScopedResource()
             
             // 2. Fetch the data
-            waveformSamples = await EditorViewModel.generateWaveform(from: clip.asset.url)
+            waveformSamples = await EditorViewModel.generateWaveform(
+                from: clip.asset.url,
+                startTime: clip.sourceStart,
+                endTime: clip.sourceStart + clip.duration
+            )
             
             // 3. Clean up access
             if isSecured {
@@ -120,3 +164,4 @@ struct TimelineTrackLane: View {
         }
     }
 }
+

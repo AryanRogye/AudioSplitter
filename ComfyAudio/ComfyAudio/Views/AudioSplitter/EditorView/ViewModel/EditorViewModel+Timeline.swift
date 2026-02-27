@@ -47,6 +47,9 @@ extension EditorViewModel {
      * Removes the song from the timeline view
      */
     public func removeURLFromSong(_ clip: TimelineClip) {
+        if selectedClip == clip.id {
+            selectedClip = nil
+        }
         timelineSong.remove(clip)
     }
 }

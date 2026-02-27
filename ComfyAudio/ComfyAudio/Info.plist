@@ -5,7 +5,6 @@
         <key>UIBackgroundModes</key>
         <array>
             <string>audio</string>
-            <string>processing</string>
         </array>
         
         <key>UIFileSharingEnabled</key>
@@ -14,8 +13,14 @@
         <key>LSSupportsOpeningDocumentsInPlace</key>
         <true/>
         
+        <key>NSCameraUsageDescription</key>
+        <string>ComfyAudio can use the camera to capture reference media for voice-clone and audio workflows when you choose to record.</string>
+        
         <key>NSPhotoLibraryAddUsageDescription</key>
-        <string>Need this bro</string>
+        <string>ComfyAudio needs access to your photo library so you can import media for voice-clone and audio processing workflows.</string>
+        
+        <key>NSPhotoLibraryUsageDescription</key>
+        <string>ComfyAudio needs access to your photo library so you can pick videos and audio files for processing.</string>
         
         <key>UTExportedTypeDeclarations</key>
         <array>

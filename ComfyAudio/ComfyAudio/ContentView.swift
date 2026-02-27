@@ -44,7 +44,7 @@ enum ComfyTab: String, CaseIterable {
 
 struct ContentView: View {
     
-    @State private var selection: ComfyTab = .audioSplitter
+    @State private var selection: ComfyTab = .home
     
     var body: some View {
         TabView(selection: $selection) {

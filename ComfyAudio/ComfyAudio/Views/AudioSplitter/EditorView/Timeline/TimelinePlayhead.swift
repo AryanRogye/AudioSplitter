@@ -42,6 +42,7 @@ struct TimelinePlayhead: View {
                         let timeDelta = value.translation.width / pixelsPerSecond
                         let newTime = max(0, start + timeDelta)
 
+                        editorVM.timelineSong.stop()
                         editorVM.timelineSong.seek(to: newTime)
                     }
                     .onEnded { _ in
