@@ -41,6 +41,8 @@ struct CurrentStagingContent: View {
                                 let track = editorVM.stagedTracks[index]
                                 StagedBundleCard(item: track) {
                                     editorVM.removeFromStaged(track)
+                                } onAddToTimeline: {
+                                    editorVM.addDroppedItems([track])
                                 }
                                 .contentShape(.dragPreview, RoundedRectangle(cornerRadius: 12))
                                 .draggable(track) {

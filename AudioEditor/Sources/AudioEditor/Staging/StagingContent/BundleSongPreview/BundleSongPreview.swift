@@ -16,6 +16,7 @@ struct BundleSongPreview: View {
     
     let url: URL
     var onRemove: (() -> Void)? = nil
+    var onAddToTimeline: (() -> Void)? = nil
     
     /// This is created per item that is staged
     @State fileprivate var vm = BundleSongPreviewViewModel()
@@ -27,7 +28,7 @@ struct BundleSongPreview: View {
                 Button {
                     vm.playAudio(url)
                 } label: {
-                    Image(systemName: "play.fill")
+                    Image(systemName: vm.preview.isPlaying ? "pause.fill" : "play.fill")
                         .imageScale(.medium)
                         .padding(8)
                         .background(
@@ -39,7 +40,9 @@ struct BundleSongPreview: View {
                 .accessibilityLabel("Play preview")
 
                 
-                Button(action: { /* TODO: handle add to timeline */ }) {
+                Button(
+                    action: { onAddToTimeline?() }
+                ) {
                     HStack(spacing: 6) {
                         Image(systemName: "plus.circle")
                             .imageScale(.medium)

@@ -12,6 +12,7 @@ struct StagedBundleCard: View {
     
     let item: EditorFile
     var onRemove: () -> Void
+    var onAddToTimeline: () -> Void
     
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
@@ -34,7 +35,8 @@ struct StagedBundleCard: View {
             VStack(alignment: .leading, spacing: 8) {
                 BundleSongPreview(
                     url: item.url,
-                    onRemove: onRemove
+                    onRemove: onRemove,
+                    onAddToTimeline: onAddToTimeline
                 )
             }
         }
@@ -53,9 +55,9 @@ struct StagedBundleCard: View {
 
 
 #Preview {
-    StagedBundleCard(item: .previewSong, onRemove: {})
-    StagedBundleCard(item: .previewSong, onRemove: {})
-    StagedBundleCard(item: .previewSong, onRemove: {})
-    StagedBundleCard(item: .previewSong, onRemove: {})
+    StagedBundleCard(item: .previewSong, onRemove: {}, onAddToTimeline: {})
+    StagedBundleCard(item: .previewSong, onRemove: {}, onAddToTimeline: {})
+    StagedBundleCard(item: .previewSong, onRemove: {}, onAddToTimeline: {})
+    StagedBundleCard(item: .previewSong, onRemove: {}, onAddToTimeline: {})
 }
 

@@ -13,6 +13,8 @@ public struct EditorView: View {
     
     public init(allSongs: [EditorFile]) {
         self.editorVM = EditorViewModel(allSongs: allSongs, /*history: historyStore*/)
+        /// DEBUG: REMOVE THIS IN PRODUCTION
+        editorVM.addDroppedItems(allSongs)
     }
     
     public var body: some View {
@@ -44,6 +46,9 @@ public struct EditorView: View {
 #if DEBUG
 #Preview {
     return EditorView(allSongs: [.previewSong])
+        .task {
+            
+        }
 }
 #endif
 
