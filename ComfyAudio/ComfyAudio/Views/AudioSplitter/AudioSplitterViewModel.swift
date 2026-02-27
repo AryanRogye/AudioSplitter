@@ -74,7 +74,7 @@ final class AudioSplitterViewModel {
             playbackController.stopPreview()
         } else {
             do {
-                try playbackController.togglePreview(fileURL: audioURL, startTime: 0)
+                try playbackController.togglePreview(fileURL: audioURL, startTime: 0, volume: 1.0)
                 isPaused = false
             } catch {
                 isPaused = true
@@ -95,7 +95,7 @@ final class AudioSplitterViewModel {
                     isPaused = false
                 } else {
                     do {
-                        try playbackController.togglePreview(fileURL: selectedFileURL, startTime: 0)
+                        try playbackController.togglePreview(fileURL: selectedFileURL, startTime: 0, volume: 1.0)
                         isPaused = false
                     } catch {
                         isPaused = true
