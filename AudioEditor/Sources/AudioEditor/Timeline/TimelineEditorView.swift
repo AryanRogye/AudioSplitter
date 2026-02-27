@@ -59,16 +59,18 @@ struct TimelineEditorView: View {
                 ScrollView(.horizontal, showsIndicators: false) {
                     ZStack(alignment: .topLeading) {
                         
+                        /// this is used to go to the start
                         Color.clear.id("start")
                         
+                        /// This is used to go to the playhead location
                         HStack(spacing: 0) {
                             ForEach(0...markerSeconds, id: \.self) { second in
                                 Color.clear
-                                    .frame(width: pixelsPerSecond, height: 1)   // 👈 key
+                                    .frame(width: pixelsPerSecond, height: 1)
                                     .id("sec-\(second)")
                             }
                         }
-                        .frame(height: 1) // optional but helps
+                        .frame(height: 1)
                         
                         TimelineContent(
                             editorVM: editorVM,
@@ -76,7 +78,6 @@ struct TimelineEditorView: View {
                             timelineLeftInset: timelineLeftInset,
                             headerWidth: headerWidth
                         )
-
                         
                         TimelinePlayhead(
                             editorVM: editorVM,

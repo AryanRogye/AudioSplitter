@@ -46,8 +46,8 @@ public struct EditorView: View {
         self.editorVM = EditorViewModel(allSongs: allSongs)
         self.theme = theme
         /// DEBUG: REMOVE THIS IN PRODUCTION
-//        editorVM.addToStaged(allSongs.first!)
-//        editorVM.addDroppedItems(allSongs)
+        editorVM.addToStaged(allSongs.first!)
+        editorVM.addDroppedItems(allSongs)
     }
     
     public var body: some View {
@@ -84,9 +84,6 @@ public struct EditorView: View {
 #if DEBUG
 #Preview {
     return EditorView(allSongs: [.previewSong])
-        .task {
-            
-        }
 }
 #endif
 
