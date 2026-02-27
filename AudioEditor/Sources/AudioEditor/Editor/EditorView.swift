@@ -7,15 +7,15 @@
 
 import SwiftUI
 
-struct EditorView: View {
+public struct EditorView: View {
     
     @State private var editorVM : EditorViewModel
     
-    init(allSongs: [EditorFile], /*historyStore: AudioHistoryStoring*/) {
+    public init(allSongs: [EditorFile]) {
         self.editorVM = EditorViewModel(allSongs: allSongs, /*history: historyStore*/)
     }
     
-    var body: some View {
+    public var body: some View {
         GeometryReader { geo in
             
             let libraryHeight = geo.size.height * 0.30
@@ -39,3 +39,27 @@ struct EditorView: View {
         }
     }
 }
+
+
+#if DEBUG
+#Preview {
+    return EditorView(allSongs: [.previewSong])
+}
+#endif
+
+#if DEBUG
+extension EditorFile {
+    static var previewSong: EditorFile {
+        let bundle = Bundle.module
+        
+        let url = bundle.url(forResource: "Belong to the City", withExtension: "mp3")
+        return EditorFile(
+            url ?? URL(fileURLWithPath: "/dev/null"),
+            id: UUID(),
+            name: "Belong to the City",
+            created: .now,
+            type: .all
+        )
+    }
+}
+#endif

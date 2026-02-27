@@ -8,6 +8,7 @@
 import SwiftUI
 import AudioHelper
 import UniformTypeIdentifiers
+import AudioEditor
 
 struct AudioSplitterView: View {
     

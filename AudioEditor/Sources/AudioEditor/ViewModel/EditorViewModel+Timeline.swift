@@ -6,7 +6,7 @@
 //
 
 import Foundation
-import AudioHelper
+import AudioPlayback
 
 // MARK: - Timeline
 extension EditorViewModel {

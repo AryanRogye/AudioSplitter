@@ -7,7 +7,7 @@
 
 import Foundation
 import AVFoundation
-import AudioHelper
+import AudioPlayback
 
 enum TransportState {
     case stopped
@@ -17,7 +17,7 @@ enum TransportState {
 
 @Observable
 @MainActor
-class TimelineClip: Identifiable, Equatable {
+class TimelineClip: Identifiable, @MainActor Equatable, Sendable {
     static func == (lhs: TimelineClip, rhs: TimelineClip) -> Bool {
         return lhs.id == rhs.id
     }

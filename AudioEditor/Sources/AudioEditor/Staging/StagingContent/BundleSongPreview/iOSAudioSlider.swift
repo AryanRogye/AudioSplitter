@@ -6,7 +6,7 @@
 //
 
 import SwiftUI
-import AudioHelper
+import AudioPlayback
 
 /// This is the slider that is used to seek the song to the new position based on finger
 /// position

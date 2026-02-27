@@ -7,6 +7,8 @@
 
 import Foundation
 import AudioHelper
+import AudioEditor
+import AudioPlayback
 
 @Observable
 @MainActor

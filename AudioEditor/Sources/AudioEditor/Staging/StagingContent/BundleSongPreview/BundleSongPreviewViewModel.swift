@@ -6,7 +6,7 @@
 //
 
 import Foundation
-import AudioHelper
+import AudioPlayback
 
 /// ViewModel for BundleSongPreview, this drives the entire row's audio
 extension BundleSongPreview {

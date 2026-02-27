@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		9B703DB92F51218800E4CBED /* AudioEditor in Frameworks */ = {isa = PBXBuildFile; productRef = 9B703DB82F51218800E4CBED /* AudioEditor */; };
+		9B703DBC2F51226D00E4CBED /* AudioPlayback in Frameworks */ = {isa = PBXBuildFile; productRef = 9B703DBB2F51226D00E4CBED /* AudioPlayback */; };
 		9BB2780B2F4CDE1900303040 /* AudioHelper in Frameworks */ = {isa = PBXBuildFile; productRef = 9BB2780A2F4CDE1900303040 /* AudioHelper */; };
 /* End PBXBuildFile section */
 
@@ -40,6 +42,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				9B703DB92F51218800E4CBED /* AudioEditor in Frameworks */,
+				9B703DBC2F51226D00E4CBED /* AudioPlayback in Frameworks */,
 				9BB2780B2F4CDE1900303040 /* AudioHelper in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -84,6 +88,8 @@
 			name = ComfyAudio;
 			packageProductDependencies = (
 				9BB2780A2F4CDE1900303040 /* AudioHelper */,
+				9B703DB82F51218800E4CBED /* AudioEditor */,
+				9B703DBB2F51226D00E4CBED /* AudioPlayback */,
 			);
 			productName = ComfyAudio;
 			productReference = 9BB277832F4CB4BE00303040 /* ComfyAudio.app */;
@@ -115,6 +121,8 @@
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
 				9BB278092F4CDE1900303040 /* XCLocalSwiftPackageReference "../AudioHelper" */,
+				9B703DB72F51218800E4CBED /* XCLocalSwiftPackageReference "../AudioEditor" */,
+				9B703DBA2F51226D00E4CBED /* XCLocalSwiftPackageReference "../AudioPlayback" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 9BB277842F4CB4BE00303040 /* Products */;
@@ -362,6 +370,14 @@
 /* End XCConfigurationList section */
 
 /* Begin XCLocalSwiftPackageReference section */
+		9B703DB72F51218800E4CBED /* XCLocalSwiftPackageReference "../AudioEditor" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = ../AudioEditor;
+		};
+		9B703DBA2F51226D00E4CBED /* XCLocalSwiftPackageReference "../AudioPlayback" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = ../AudioPlayback;
+		};
 		9BB278092F4CDE1900303040 /* XCLocalSwiftPackageReference "../AudioHelper" */ = {
 			isa = XCLocalSwiftPackageReference;
 			relativePath = ../AudioHelper;
@@ -369,6 +385,14 @@
 /* End XCLocalSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		9B703DB82F51218800E4CBED /* AudioEditor */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = AudioEditor;
+		};
+		9B703DBB2F51226D00E4CBED /* AudioPlayback */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = AudioPlayback;
+		};
 		9BB2780A2F4CDE1900303040 /* AudioHelper */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = AudioHelper;

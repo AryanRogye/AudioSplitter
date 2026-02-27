@@ -14,20 +14,20 @@ extension UTType {
 }
 
 
-public enum SongType: String, Codable {
+public enum SongType: String, Codable, Sendable {
     case vocal
     case instrumental
     case all
 }
 
 /// This helps us translate whatever spagetti the ml had us doing to something clean the UI can use
-public struct EditorFile: Identifiable, Codable, Hashable, Transferable, Equatable {
+public struct EditorFile: Identifiable, Codable, Hashable, Transferable, Equatable, Sendable {
     
     public let id: UUID
     let displayName: String
     let url: URL
     let type: SongType
-    let createdAt: Date
+    public let createdAt: Date
     
     public init(_ url: URL, id: UUID = UUID(), name: String, created: Date, type: SongType) {
         self.id = id
