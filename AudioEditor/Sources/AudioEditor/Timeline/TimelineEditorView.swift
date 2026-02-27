@@ -18,42 +18,81 @@ struct TimelineEditorView: View {
     private let headerWidth: CGFloat = 90
     private let headerSpacing: CGFloat = 9
     private let laneHPadding: CGFloat = 8
+    private let minimumTimelineSeconds: Int = 180
 
     private var timelineLeftInset: CGFloat {
         headerWidth + headerSpacing + laneHPadding
     }
+    
+    private var markerSeconds: Int {
+        let dynamicMax = Int(ceil(max(editorVM.timelineSong.currentTime, editorVM.timelineSong.duration)))
+        return max(minimumTimelineSeconds, dynamicMax)
+    }
 
+    @State private var scrollProxy: ScrollViewProxy? = nil
     @State private var initialPlayheadTime: TimeInterval? = nil
 
     var body: some View {
         VStack(spacing: 0) {
             TimelinePlaybackControls(isPlaying: editorVM.isPlaying) {
                 editorVM.toggleAudio()
+            } playbackToStart: {
+                editorVM.timelineSong.stop()
+                editorVM.timelineSong.seek(to: 0)
+                scrollProxy?.scrollTo("start", anchor: .leading)
+            } cameraToStart: {
+                scrollProxy?.scrollTo("start", anchor: .leading)
+            } toPlayhead: {
+                let t = editorVM.timelineSong.currentTime
+                let s = max(0, min(Int(t.rounded(.down)), markerSeconds))
+                withAnimation(.easeInOut(duration: 0.2)) {
+                    scrollProxy?.scrollTo("sec-\(s)", anchor: .center)
+                }
             }
-
+            
             Rectangle()
                 .frame(maxWidth: .infinity)
                 .frame(height: 1)
                 .foregroundStyle(theme.accent.opacity(0.5))
+            
+            ScrollViewReader { proxy in
+                ScrollView(.horizontal, showsIndicators: false) {
+                    ZStack(alignment: .topLeading) {
+                        
+                        Color.clear.id("start")
+                        
+                        HStack(spacing: 0) {
+                            ForEach(0...markerSeconds, id: \.self) { second in
+                                Color.clear
+                                    .frame(width: pixelsPerSecond, height: 1)   // 👈 key
+                                    .id("sec-\(second)")
+                            }
+                        }
+                        .frame(height: 1) // optional but helps
+                        
+                        TimelineContent(
+                            editorVM: editorVM,
+                            pixelsPerSecond: pixelsPerSecond,
+                            timelineLeftInset: timelineLeftInset,
+                            headerWidth: headerWidth
+                        )
 
-            ScrollView(.horizontal, showsIndicators: false) {
-                ZStack(alignment: .topLeading) {
-                    TimelineContent(
-                        editorVM: editorVM,
-                        pixelsPerSecond: pixelsPerSecond,
-                        timelineLeftInset: timelineLeftInset,
-                        headerWidth: headerWidth
-                    )
-
-                    TimelinePlayhead(
-                        editorVM: editorVM,
-                        pixelsPerSecond: pixelsPerSecond,
-                        timelineLeftInset: timelineLeftInset,
-                        initialPlayheadTime: $initialPlayheadTime
-                    )
+                        
+                        TimelinePlayhead(
+                            editorVM: editorVM,
+                            pixelsPerSecond: pixelsPerSecond,
+                            timelineLeftInset: timelineLeftInset,
+                            initialPlayheadTime: $initialPlayheadTime
+                        )
+                        .id("playhead")
+                    }
+                }
+                .task {
+                    if scrollProxy == nil {
+                        scrollProxy = proxy
+                    }
                 }
             }
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(theme.backgroundPrimary)
@@ -65,84 +104,11 @@ struct TimelineEditorView: View {
         }
         .overlay(alignment: .bottom) {
             if let id = editorVM.selectedClip {
-                GlassEffectContainer {
-                    VStack(alignment: .leading, spacing: 10) {
-                        // Header
-                        HStack(spacing: 8) {
-                            Image(systemName: "waveform")
-                                .symbolRenderingMode(.hierarchical)
-                                .foregroundStyle(Color.accentColor)
-                            VStack(alignment: .leading, spacing: 2) {
-                                Text("Selection Tools")
-                                    .font(.headline)
-                                Text("Selected: \(id)")
-                                    .font(.footnote)
-                                    .foregroundStyle(.secondary)
-                            }
-                            Spacer()
-                        }
-
-                        // Primary action row
-                        HStack(spacing: 12) {
-                            Button {
-                                Task { try? await editorVM.splitAtCurrentSelection() }
-                            } label: {
-                                Label("Split at Playhead", systemImage: "scissors")
-                                    .font(.subheadline.weight(.semibold))
-                                    .padding(.horizontal, 12)
-                                    .padding(.vertical, 8)
-                                    .background(
-                                        Capsule().fill(Color.accentColor.opacity(0.15))
-                                    )
-                            }
-                            .buttonStyle(.plain)
-                            .foregroundStyle(Color.accentColor)
-
-                            Button {
-                                // TODO: More actions soon
-                            } label: {
-                                Label("More", systemImage: "ellipsis")
-                                    .font(.subheadline)
-                                    .padding(.horizontal, 12)
-                                    .padding(.vertical, 8)
-                                    .background(
-                                        Capsule().stroke(.secondary.opacity(0.35), lineWidth: 1)
-                                    )
-                            }
-                            .buttonStyle(.plain)
-                            .foregroundStyle(.primary)
-
-                            Spacer()
-                        }
-                    }
-                    .padding(12)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .background(
-                        ZStack {
-                            // Material base
-                            RoundedRectangle(cornerRadius: 14, style: .continuous)
-                                .fill(.ultraThinMaterial)
-                            // Subtle accent gradient sheen
-                            RoundedRectangle(cornerRadius: 14, style: .continuous)
-                                .fill(
-                                    LinearGradient(colors: [
-                                        Color.white.opacity(0.10),
-                                        Color.accentColor.opacity(0.08)
-                                    ], startPoint: .topLeading, endPoint: .bottomTrailing)
-                                )
-                                .blendMode(.overlay)
-                            // Inner stroke for definition
-                            RoundedRectangle(cornerRadius: 14, style: .continuous)
-                                .strokeBorder(Color.white.opacity(0.25), lineWidth: 0.5)
-                        }
-                    )
-                    .shadow(color: .black.opacity(0.08), radius: 12, x: 0, y: 8)
-                    .padding(.horizontal)
-                    .padding(.bottom)
-                    .transition(.move(edge: .bottom).combined(with: .opacity))
-                }
+                TimelineSelectionOverlay(
+                    editorVM: editorVM,
+                    id: id
+                )
             }
         }
     }
 }
-

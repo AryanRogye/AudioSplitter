@@ -27,6 +27,11 @@ final class EditorViewModel {
         self.allSongs = allSongs
     }
     
+    public func selectedClipFile() -> TimelineClip? {
+        guard let selectedClip else { return nil }
+        return timelineSong.getClip(byID: selectedClip)
+    }
+    
     public func splitAtCurrentSelection() async throws {
         guard let selectedClip else { return }
         try timelineSong.pause()

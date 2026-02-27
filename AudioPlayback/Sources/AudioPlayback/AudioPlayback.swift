@@ -36,7 +36,7 @@ public final class AVAudioPreviewPlayback: NSObject, AVAudioPlayerDelegate {
         audioPlayer = nil
     }
     
-    public func togglePreview(fileURL: URL, startTime: TimeInterval) throws {
+    public func togglePreview(fileURL: URL, startTime: TimeInterval, volume: Float) throws {
         guard FileManager.default.fileExists(atPath: fileURL.path) else {
             throw StagePreviewPlaybackError.fileMissing(path: fileURL.path)
         }
@@ -57,6 +57,7 @@ public final class AVAudioPreviewPlayback: NSObject, AVAudioPlayerDelegate {
             player.delegate = self
             let clampedStart = max(0, min(startTime, max(0, player.duration - 0.05)))
             player.currentTime = clampedStart
+            player.volume = volume
             player.prepareToPlay()
             let didPlay = player.play()
             if !didPlay {
@@ -80,6 +81,9 @@ public final class AVAudioPreviewPlayback: NSObject, AVAudioPlayerDelegate {
         }
     }
     
+    public func updateVolume(_ volume: Float) {
+        audioPlayer?.volume = volume
+    }
     public func play() {
         audioPlayer?.play()
     }

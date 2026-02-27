@@ -32,7 +32,8 @@ extension BundleSongPreview {
             do {
                 try preview.togglePreview(
                     fileURL: url,
-                    startTime: 0
+                    startTime: 0,
+                    volume: 1.0
                 )
             } catch let error as StagePreviewPlaybackError {
                 switch error {

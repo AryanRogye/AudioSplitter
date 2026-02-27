@@ -11,6 +11,7 @@ struct TimelineTrackLane: View {
     let pixelsPerSecond: CGFloat
     let headerWidth: CGFloat
 
+    @State private var lastSnappedTime: Double? = nil
     @State private var initialStartTime: TimeInterval? = nil
     @State private var waveformSamples: [Float] = []
     @Binding private var selected: Bool
@@ -41,6 +42,8 @@ struct TimelineTrackLane: View {
             )
         }
     }
+    
+    @State private var isDragging = false
 
     var body: some View {
         HStack(spacing: 0) {
@@ -87,6 +90,10 @@ struct TimelineTrackLane: View {
                 ZStack {
                     RoundedRectangle(cornerRadius: 4)
                         .fill(color)
+                        .scaleEffect(isDragging ? 1.02 : 1.0)
+                        .shadow(color: .black.opacity(isDragging ? 0.35 : 0.2),
+                                radius: isDragging ? 6 : 2, x: 0, y: 2)
+                        .animation(.snappy(duration: 0.12), value: isDragging)
                     
                     WaveformShape(samples: waveformSamples)
                         .fill(Color.white.opacity(0.7))
@@ -103,17 +110,38 @@ struct TimelineTrackLane: View {
                 .shadow(color: .black.opacity(0.2), radius: 2, x: 0, y: 1)
                 .offset(x: clip.startTime * pixelsPerSecond)
                 .gesture(
-                    DragGesture()
+                    DragGesture(minimumDistance: 2)
                         .onChanged { value in
                             if initialStartTime == nil {
                                 initialStartTime = clip.startTime
+                                isDragging = true
                             }
                             guard let start = initialStartTime else { return }
-                            let timeDelta = value.translation.width / pixelsPerSecond
-                            clip.startTime = max(0, start + timeDelta)
+                            
+                            let raw = max(0, start + (value.translation.width / pixelsPerSecond))
+                            
+                            let step = 0.10
+                            let snapped = snap(raw, step: step)
+                            let useSnap = abs(snapped - raw) < 0.03
+                            
+                            if useSnap {
+                                // Only trigger haptic if we just snapped to a NEW line
+                                if lastSnappedTime != snapped {
+                                    lastSnappedTime = snapped
+                                    
+                                    UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+                                }
+                            } else {
+                                // Reset when pulled away from a snap point
+                                lastSnappedTime = nil
+                            }
+                            
+                            clip.startTime = useSnap ? snapped : raw
                         }
                         .onEnded { _ in
                             initialStartTime = nil
+                            isDragging = false
+                            lastSnappedTime = nil
                         }
                 )
             }
@@ -140,5 +168,9 @@ struct TimelineTrackLane: View {
                 clip.asset.url.stopAccessingSecurityScopedResource()
             }
         }
+    }
+    
+    private func snap(_ t: Double, step: Double) -> Double {
+        (t / step).rounded() * step
     }
 }

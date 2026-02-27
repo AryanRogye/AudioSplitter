@@ -24,10 +24,12 @@ struct TimelineContent: View {
                 LazyVStack(alignment: .leading, spacing: 12) {
                     ForEach(editorVM.timelineSong.clips) { clip in
                         Button(action: {
-                            if editorVM.selectedClip == clip.id {
-                                editorVM.selectedClip = nil
-                            } else {
-                                editorVM.selectedClip = clip.id
+                            withAnimation(.spring) {
+                                if editorVM.selectedClip == clip.id {
+                                    editorVM.selectedClip = nil
+                                } else {
+                                    editorVM.selectedClip = clip.id
+                                }
                             }
                         }) {
                             ZStack {

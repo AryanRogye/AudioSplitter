@@ -43,11 +43,11 @@ public struct EditorView: View {
             textSecondary : Color(hex: "#B8B8B8")!,
         )
     ) {
-        self.editorVM = EditorViewModel(allSongs: allSongs, /*history: historyStore*/)
+        self.editorVM = EditorViewModel(allSongs: allSongs)
         self.theme = theme
         /// DEBUG: REMOVE THIS IN PRODUCTION
-//        editorVM.addToStaged(allSongs.first!)
-//        editorVM.addDroppedItems(allSongs)
+        editorVM.addToStaged(allSongs.first!)
+        editorVM.addDroppedItems(allSongs)
     }
     
     public var body: some View {

@@ -10,6 +10,9 @@ struct TimelinePlaybackControls: View {
     @Environment(EditorTheme.self) var theme
     let isPlaying: Bool
     let onToggle: () -> Void
+    let playbackToStart: () -> Void
+    let cameraToStart: () -> Void
+    let toPlayhead: () -> Void
 
     var body: some View {
         HStack {
@@ -27,6 +30,20 @@ struct TimelinePlaybackControls: View {
             .padding(.vertical, 6)
             
             Spacer()
+            
+            Menu {
+                Button("Jump to Start") { cameraToStart() }
+                Button("To Playhead") { toPlayhead() }
+                Button("Restart Playback") { playbackToStart() }
+            } label: {
+                Image(systemName: "ellipsis")
+                    .foregroundStyle(theme.accent)
+                    .imageScale(.medium)
+                    .padding(8)
+                    .background(
+                        Circle().stroke(theme.accent.opacity(0.35), lineWidth: 1)
+                    )
+            }
         }
     }
 }

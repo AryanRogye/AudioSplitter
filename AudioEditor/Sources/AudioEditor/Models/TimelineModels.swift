@@ -25,6 +25,9 @@ class TimelineClip: Identifiable, @MainActor Equatable, Sendable {
     let id = UUID()
     var asset: EditorFile
     var startTime: TimeInterval = 0.0
+    
+    /// defaulting to 1.0
+    var volume: Float = 1.0
     var audio = AVAudioPreviewPlayback()
     
     var sourceStart: TimeInterval = 0
@@ -34,6 +37,19 @@ class TimelineClip: Identifiable, @MainActor Equatable, Sendable {
     init(asset: EditorFile) async {
         self.asset = asset
         await calcDuration()
+        observeVolume()
+    }
+    
+    private func observeVolume() {
+        withObservationTracking {
+            _ = volume
+        } onChange: {
+            DispatchQueue.main.async { [weak self] in
+                guard let self else { return }
+                self.audio.updateVolume(volume)
+                observeVolume()
+            }
+        }
     }
     
     private func calcDuration() async {
@@ -182,7 +198,12 @@ class TimelineSong {
                     if Task.isCancelled { return }
                     
                     /// fires the audio from the clip's beginning (sourceStart)
-                    try? self.playAudio(previewAudio: clip.audio, url: clip.asset.url, time: clip.sourceStart)
+                    try? self.playAudio(
+                        previewAudio: clip.audio,
+                        url: clip.asset.url,
+                        time: clip.sourceStart,
+                        volume: clip.volume
+                    )
                 }
                 /// we're in the range to play something
                 else {
@@ -190,10 +211,14 @@ class TimelineSong {
                     let timelineOffset = sessionTime - clip.startTime
                     let fileTime = clip.sourceStart + timelineOffset
                     /// Plays
-                    try? self.playAudio(previewAudio: clip.audio, url: clip.asset.url, time: fileTime)
+                    try? self.playAudio(
+                        previewAudio: clip.audio,
+                        url: clip.asset.url,
+                        time: fileTime,
+                        volume: clip.volume
+                    )
                 }
             }
-            
             
             /// calculating the exact "expiration timer" for the clip
             
@@ -245,8 +270,13 @@ class TimelineSong {
         scheduled.removeAll()
     }
     
-    private func playAudio(previewAudio: AVAudioPreviewPlayback, url: URL, time: TimeInterval) throws {
-        try previewAudio.togglePreview(fileURL: url, startTime: time)
+    private func playAudio(
+        previewAudio: AVAudioPreviewPlayback,
+        url: URL,
+        time: TimeInterval,
+        volume: Float
+    ) throws {
+        try previewAudio.togglePreview(fileURL: url, startTime: time, volume: volume)
     }
     
     public func stop() {
