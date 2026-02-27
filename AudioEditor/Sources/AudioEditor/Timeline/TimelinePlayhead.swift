@@ -6,6 +6,8 @@
 import SwiftUI
 
 struct TimelinePlayhead: View {
+    
+    @Environment(EditorTheme.self) var theme
     @Bindable var editorVM: EditorViewModel
     let pixelsPerSecond: CGFloat
     let timelineLeftInset: CGFloat
@@ -16,12 +18,12 @@ struct TimelinePlayhead: View {
         TimelineView(.animation) { _ in
             ZStack(alignment: .top) {
                 Rectangle()
-                    .fill(Color.red)
+                    .fill(theme.accent)
                     .frame(width: 2)
                     .frame(maxHeight: .infinity)
 
                 Image(systemName: "arrowtriangle.down.fill")
-                    .foregroundColor(.red)
+                    .foregroundColor(theme.accent)
                     .offset(y: -2)
             }
             .frame(width: 30)

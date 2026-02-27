@@ -104,11 +104,19 @@ struct TimelineEditorView: View {
             return true
         }
         .overlay(alignment: .bottom) {
+            if editorVM.selectedClip != nil {
+                Color.black.opacity(0.001)
+                    .frame(height: 140)
+                    .frame(maxWidth: .infinity)
+                    .contentShape(Rectangle())
+                    .zIndex(0)
+            }
+        }
+        .overlay(alignment: .bottom) {
             if let id = editorVM.selectedClip {
-                TimelineSelectionOverlay(
-                    editorVM: editorVM,
-                    id: id
-                )
+                TimelineSelectionOverlay(editorVM: editorVM, id: id)
+                    .contentShape(RoundedRectangle(cornerRadius: 8))
+                    .zIndex(1)
             }
         }
     }

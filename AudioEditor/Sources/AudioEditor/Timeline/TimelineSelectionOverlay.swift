@@ -34,9 +34,9 @@ struct TimelineSelectionOverlay: View {
         .clipped()
         .padding(12)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .glassEffect(.clear.interactive().tint(.white.opacity(0.3)), in: RoundedRectangle(cornerRadius: 8))
-        .padding(.horizontal)
-        .padding(.bottom)
+        .glassEffect(.clear.interactive().tint(.black.opacity(0.6)), in: RoundedRectangle(cornerRadius: 8))
+        .padding(.horizontal, 8)
+        .padding(.bottom, 8)
         .transition(.move(edge: .bottom).combined(with: .opacity))
     }
     
@@ -87,6 +87,22 @@ struct TimelineSelectionOverlay: View {
                 }
                 .buttonStyle(.plain)
                 .contentShape(Capsule())
+                
+                Button {
+                    withAnimation {
+                        
+                    }
+                } label: {
+                    Image(systemName: "plus.square.on.square")
+                        .font(.system(size: 16, weight: .medium))
+                        .frame(width: 36, height: 36)
+                        .background(
+                            Capsule().fill(theme.accent.opacity(0.15))
+                        )
+                }
+                .buttonStyle(.plain)
+                .contentShape(Capsule())
+                
             }
             .foregroundStyle(theme.accent)
         }

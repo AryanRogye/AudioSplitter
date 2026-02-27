@@ -27,16 +27,26 @@ struct TimelineTrackLane: View {
         max(clip.duration, 0.2) * pixelsPerSecond
     }
     
+    var waveformColor: Color {
+        if selected {
+            return Color.black.opacity(0.4)
+        } else {
+            return Color.white.opacity(0.7)
+        }
+    }
     var color: LinearGradient {
         if selected {
             return LinearGradient(
-                colors: [Color.red.opacity(0.1), Color.red.opacity(0.3)],
+                colors: [
+                    theme.accent.opacity(0.8),
+                    theme.accent.mix(with: .white, by: 0.2)
+                ],
                 startPoint: .top,
                 endPoint: .bottom
             )
         } else {
             return LinearGradient(
-                colors: [Color.blue.opacity(0.6), Color.blue.opacity(0.8)],
+                colors: [theme.accent.opacity(0.6), theme.accent.mix(with: .black, by: 0.4).opacity(0.8)],
                 startPoint: .top,
                 endPoint: .bottom
             )
@@ -53,7 +63,7 @@ struct TimelineTrackLane: View {
                     .font(.system(size: 11, weight: .semibold, design: .rounded))
                     .lineLimit(1)
                     .truncationMode(.tail)
-                    .foregroundStyle(theme.accent)
+                    .foregroundStyle(theme.accent.opacity(0.9))
                 
                 // Start time chip
                 HStack(spacing: 4) {
@@ -62,7 +72,7 @@ struct TimelineTrackLane: View {
                     Text("\(clip.startTime, specifier: "%.2f")s")
                         .font(.system(size: 10, design: .monospaced))
                 }
-                .foregroundStyle(theme.accent)
+                .foregroundStyle(theme.accent.opacity(0.8))
                 .padding(.horizontal, 6)
                 
                 // Duration chip
@@ -72,7 +82,7 @@ struct TimelineTrackLane: View {
                     Text("\(clip.duration, specifier: "%.2f")s")
                         .font(.system(size: 10, design: .monospaced))
                 }
-                .foregroundStyle(theme.accent)
+                .foregroundStyle(theme.accent.opacity(0.8))
                 .padding(.horizontal, 6)
             }
             .font(.system(size: 11, weight: .bold, design: .rounded))
@@ -96,7 +106,7 @@ struct TimelineTrackLane: View {
                         .animation(.snappy(duration: 0.12), value: isDragging)
                     
                     WaveformShape(samples: waveformSamples)
-                        .fill(Color.white.opacity(0.7))
+                        .fill(waveformColor)
                         .padding(.vertical, 4)
                     
                     RoundedRectangle(cornerRadius: 4)

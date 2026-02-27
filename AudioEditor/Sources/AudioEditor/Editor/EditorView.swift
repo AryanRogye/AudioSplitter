@@ -46,8 +46,8 @@ public struct EditorView: View {
         self.editorVM = EditorViewModel(allSongs: allSongs)
         self.theme = theme
         /// DEBUG: REMOVE THIS IN PRODUCTION
-        editorVM.addToStaged(allSongs.first!)
-        editorVM.addDroppedItems(allSongs)
+//        editorVM.addToStaged(allSongs.first!)
+//        editorVM.addDroppedItems(allSongs)
     }
     
     public var body: some View {
@@ -58,7 +58,6 @@ public struct EditorView: View {
             GeometryReader { geo in
                 let libraryHeight = geo.size.height * 0.30
                 let timelineHeight = geo.size.height * 0.70;
-                
                 VStack(spacing: 6) {
                     StagingArea(
                         editorVM: editorVM,
@@ -72,6 +71,8 @@ public struct EditorView: View {
                     )
                     .frame(height: timelineHeight)
                     .padding(.horizontal, 6)
+                    .opacity(editorVM.isRecentsOpen ? 0.5 : 1.0)
+                    .animation(.easeInOut, value: editorVM.isRecentsOpen)
                 }
                 .frame(width: geo.size.width, height: geo.size.height)
             }
