@@ -15,7 +15,7 @@ struct BeatGridView: View {
 
         Canvas { ctx, size in
             let beatPx = max(scale.pixelsPerBeat, 6)
-            let barPx = max(scale.pixelsPerBar, 6)
+            let safeBeatsPerBar = max(scale.beatsPerBar, 1)
 
             let startX: CGFloat = 0
             let endX: CGFloat = size.width
@@ -26,7 +26,7 @@ struct BeatGridView: View {
             for i in firstBeat...lastBeat {
                 let x = CGFloat(i) * beatPx
 
-                let isBar = (Int(round(x / barPx)) * Int(barPx) == Int(x))
+                let isBar = i % safeBeatsPerBar == 0
                 var path = Path()
                 path.move(to: CGPoint(x: x, y: 0))
                 path.addLine(to: CGPoint(x: x, y: size.height))

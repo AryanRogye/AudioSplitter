@@ -21,6 +21,8 @@ final class EditorViewModel {
     var shouldShowError = false
     
     var selectedClip: TimelineClip.ID?
+    var timelineBPM: Double = 120
+    var beatsPerBar: Int = 4
     
     /// Initializer
     init(allSongs: [EditorFile]) {

@@ -10,42 +10,34 @@ struct TimelineContent: View {
     let pixelsPerSecond: CGFloat
     let timelineLeftInset: CGFloat
     let headerWidth: CGFloat
+    let totalSeconds: Double
+    let bpm: Double
+    let beatsPerBar: Int
 
-    private let totalSeconds: Double = 180
     private let gridHeight: CGFloat = 60
     private let laneHeight: CGFloat = 60
-    
-    let scale : BeatScale
-    let totalWidth : CGFloat
-    init(
-        editorVM: EditorViewModel,
-        pixelsPerSecond: CGFloat,
-        timelineLeftInset: CGFloat,
-        headerWidth: CGFloat
-    ) {
-        self.editorVM = editorVM
-        self.pixelsPerSecond = pixelsPerSecond
-        self.timelineLeftInset = timelineLeftInset
-        self.headerWidth = headerWidth
-        
-        scale = BeatScale(
-            bpm: 120,
-            beatsPerBar: 4,
+
+    private var scale: BeatScale {
+        BeatScale(
+            bpm: bpm,
+            beatsPerBar: beatsPerBar,
             pixelsPerSecond: pixelsPerSecond
         )
-        totalWidth = CGFloat(totalSeconds) * pixelsPerSecond
     }
-    
-    
-    var body: some View {
 
-        return ZStack(alignment: .topLeading) {
+    private var totalWidth: CGFloat {
+        CGFloat(totalSeconds) * pixelsPerSecond
+    }
+
+    var body: some View {
+        ZStack(alignment: .topLeading) {
             TimeRulerView(
                 totalSeconds: totalSeconds,
-                pixelsPerSecond: pixelsPerSecond,
+                scale: scale,
                 headerWidth: headerWidth
             )
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+
             ScrollView([.vertical], showsIndicators: false) {
                 LazyVStack(alignment: .leading, spacing: 12) {
                     ClipsView(
@@ -71,7 +63,7 @@ struct TimelineContent: View {
 }
 
 struct ClipsView: View {
-    
+
     @Environment(EditorTheme.self) var theme
     @Bindable var editorVM: EditorViewModel
     let scale: BeatScale
@@ -82,7 +74,7 @@ struct ClipsView: View {
     let gridHeight: CGFloat
     let headerWidth: CGFloat
     let pixelsPerSecond: CGFloat
-    
+
     var body: some View {
         ForEach(editorVM.timelineSong.clips) { clip in
             Button(action: {
@@ -98,11 +90,17 @@ struct ClipsView: View {
                     BeatGridView(scale: scale, totalSeconds: totalSeconds, laneHeight: gridHeight)
                         .padding(.leading, timelineLeftInset)
                         .frame(width: totalWidth + timelineLeftInset)
-                    
-                    TimelineTrackLane(clip: clip, headerWidth: headerWidth, pixelsPerSecond: pixelsPerSecond, selected: Binding(
-                        get: { editorVM.selectedClip == clip.id },
-                        set: { _ in }
-                    ))
+
+                    TimelineTrackLane(
+                        clip: clip,
+                        headerWidth: headerWidth,
+                        pixelsPerSecond: pixelsPerSecond,
+                        scale: scale,
+                        selected: Binding(
+                            get: { editorVM.selectedClip == clip.id },
+                            set: { _ in }
+                        )
+                    )
                     .frame(height: laneHeight)
                 }
                 .contentShape(Rectangle())
@@ -116,28 +114,25 @@ struct ClipsView: View {
                 }
             } preview: {
                 VStack(alignment: .leading, spacing: 6) {
-                    // Title
                     Text(clip.asset.displayName)
                         .font(.system(size: 11, weight: .semibold, design: .rounded))
                         .lineLimit(1)
                         .truncationMode(.tail)
                         .foregroundStyle(theme.accent.opacity(0.9))
-                    
-                    // Start time chip
+
                     HStack(spacing: 4) {
                         Image(systemName: "clock.arrow.circlepath")
                             .font(.system(size: 9, weight: .semibold))
-                        Text("\(clip.startTime, specifier: "%.2f")s")
+                        Text(formatBarBeat(clip.startTime))
                             .font(.system(size: 10, design: .monospaced))
                     }
                     .foregroundStyle(theme.accent.opacity(0.8))
                     .padding(.horizontal, 6)
-                    
-                    // Duration chip
+
                     HStack(spacing: 4) {
                         Image(systemName: "hourglass")
                             .font(.system(size: 9, weight: .semibold))
-                        Text("\(clip.duration, specifier: "%.2f")s")
+                        Text("\(scale.beat(at: clip.duration), specifier: "%.2f") beats")
                             .font(.system(size: 10, design: .monospaced))
                     }
                     .foregroundStyle(theme.accent.opacity(0.8))
@@ -152,66 +147,12 @@ struct ClipsView: View {
             }
         }
     }
-}
 
-struct TimeRulerView: View {
-    
-    @Environment(EditorTheme.self) var theme
-    let totalSeconds: Double
-    let pixelsPerSecond: CGFloat
-    let headerWidth: CGFloat
-    
-    var body: some View {
-        HStack(spacing: 0) {
-            Color.clear
-                .frame(width: headerWidth)
-                .padding(.horizontal, 8)
-            
-            ZStack(alignment: .bottomLeading) {
-                let steps = Int(totalSeconds / 5)
-                
-                ForEach(0...steps, id: \.self) { i in
-                    let time = Double(i) * 5
-                    
-                    bar(time)
-                        .offset(x: time * pixelsPerSecond)
-                }
-                ForEach(0...steps, id: \.self) { i in
-                    let time = Double(i) * 1
-                    
-                    if i % 5 != 0 {
-                        regularBar(time)
-                            .offset(x: time * pixelsPerSecond)
-                    }
-                }
-            }
-        }
-    }
-    
-    private func regularBar(_ time: Double) -> some View {
-        VStack(alignment: .leading, spacing: 4) {
-            Rectangle()
-                .fill(theme.accent.opacity(0.2))
-                .frame(width: 1)
-                .frame(maxHeight: .infinity, alignment: .top)
-        }
-    }
-    private func bar(_ time: Double) -> some View {
-        VStack(alignment: .leading, spacing: 4) {
-            Text(formatTime(time))
-                .font(.system(size: 11, weight: .medium, design: .monospaced))
-                .foregroundStyle(theme.accent.opacity(0.5))
-            
-            Rectangle()
-                .fill(theme.accent.opacity(0.5))
-                .frame(width: 1)
-                .frame(maxHeight: .infinity)
-        }
-    }
-    
-    private func formatTime(_ seconds: Double) -> String {
-        let m = Int(seconds) / 60
-        let s = Int(seconds) % 60
-        return String(format: "%d:%02d", m, s)
+    private func formatBarBeat(_ seconds: Double) -> String {
+        let safeBeatsPerBar = max(scale.beatsPerBar, 1)
+        let beat = scale.beat(at: seconds)
+        let barIndex = Int(beat / Double(safeBeatsPerBar))
+        let beatInBar = beat - (Double(barIndex) * Double(safeBeatsPerBar)) + 1
+        return String(format: "B%d:%0.2f", barIndex + 1, beatInBar)
     }
 }

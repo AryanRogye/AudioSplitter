@@ -1,13 +1,14 @@
 //
-//  TimelinePlaybackControls.swift
+//  TimelineTopPlaybackControls.swift
 //  ComfyAudio
 //
 
 import SwiftUI
 
-struct TimelinePlaybackControls: View {
+struct TimelineTopPlaybackControls: View {
     
     @Environment(EditorTheme.self) var theme
+    @Binding var beatsPerBar: Int
     let isPlaying: Bool
     let onToggle: () -> Void
     let playbackToStart: () -> Void
@@ -35,6 +36,9 @@ struct TimelinePlaybackControls: View {
                 Button("Jump to Start") { cameraToStart() }
                 Button("To Playhead") { toPlayhead() }
                 Button("Restart Playback") { playbackToStart() }
+                Stepper(value: $beatsPerBar, in: 1...12) {
+                    Text("Beats per Bar: \(beatsPerBar)")
+                }
             } label: {
                 Image(systemName: "ellipsis")
                     .foregroundStyle(theme.accent)

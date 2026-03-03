@@ -18,6 +18,7 @@ struct TimelineEditorView: View {
     private let headerWidth: CGFloat = 90
     private let headerSpacing: CGFloat = 9
     private let laneHPadding: CGFloat = 8
+//    private let minimumTimelineSeconds: Int = 180
     private let minimumTimelineSeconds: Int = 180
 
     private var timelineLeftInset: CGFloat {
@@ -34,7 +35,12 @@ struct TimelineEditorView: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            TimelinePlaybackControls(isPlaying: editorVM.isPlaying) {
+            
+            /// Top Controls
+            TimelineTopPlaybackControls(
+                beatsPerBar: $editorVM.beatsPerBar,
+                isPlaying: editorVM.isPlaying
+            ) {
                 editorVM.toggleAudio()
             } playbackToStart: {
                 editorVM.timelineSong.stop()
@@ -50,11 +56,14 @@ struct TimelineEditorView: View {
                 }
             }
             
+            /// Divider
             Rectangle()
                 .frame(maxWidth: .infinity)
                 .frame(height: 1)
                 .foregroundStyle(theme.accent.opacity(0.5))
             
+            
+            /// Content
             ScrollViewReader { proxy in
                 ScrollView(.horizontal, showsIndicators: false) {
                     ZStack(alignment: .topLeading) {
@@ -76,7 +85,10 @@ struct TimelineEditorView: View {
                             editorVM: editorVM,
                             pixelsPerSecond: pixelsPerSecond,
                             timelineLeftInset: timelineLeftInset,
-                            headerWidth: headerWidth
+                            headerWidth: headerWidth,
+                            totalSeconds: Double(markerSeconds),
+                            bpm: editorVM.timelineBPM,
+                            beatsPerBar: editorVM.beatsPerBar
                         )
                         
                         TimelinePlayhead(
